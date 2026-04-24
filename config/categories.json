@@ -23,6 +23,10 @@
                 {
                     "code": "gpt-image-15",
                     "name": "GPT Image 1.5"
+                },
+                {
+                    "code": "gpt-image-2",
+                    "name": "GPT Image 2"
                 }
             ]
         },

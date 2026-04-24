@@ -1,0 +1,12 @@
+{
+  "id": "yoomind-gpt-image-2",
+  "type": "github-readme",
+  "owner": "YouMind-OpenLab",
+  "repo": "awesome-gpt-image-2",
+  "branch": "main",
+  "file": "README_zh.md",
+  "adapter": "github-readme-yoomind",
+  "locale": "zh-CN",
+  "defaultCategory": "gpt-image-2",
+  "enabled": true
+}
