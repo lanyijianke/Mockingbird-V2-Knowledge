@@ -1,11 +1,11 @@
 # Mockingbird_Web Agent Guide
 
-本文档只作用于 `/Users/grank/Mockingbird_V2/Mockingbird_Web`，用于补充根目录 [AGENT.md](/Users/grank/Mockingbird_V2/AGENT.md) 的全仓规则。
+本文档是 Mockingbird-Web 独立仓库的 Agent Guide。
 
 优先级：
 - 用户明确指令
 - 本文件
-- 根目录 `AGENT.md`
+- `CLAUDE.md`（仓库级规则摘要）
 
 ## 1. 子项目定位
 

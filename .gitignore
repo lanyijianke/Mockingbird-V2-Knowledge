@@ -47,3 +47,11 @@ raw-incoming/prompts/
 
 # env secrets
 .env*.local
+.env.local
+
+# test artifacts
+test-results/
+.playwright-mcp/
+
+# database backups
+db_backups/
