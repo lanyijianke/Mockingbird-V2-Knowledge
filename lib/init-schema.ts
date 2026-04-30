@@ -1,169 +1,184 @@
-import Database from 'better-sqlite3';
+import type { PoolConnection } from 'mysql2/promise';
 
-interface TableColumnRow {
-    name: string;
+interface ColumnRow {
+    COLUMN_NAME: string;
 }
 
-function ensureColumn(
-    db: Database.Database,
+async function ensureColumn(
+    conn: PoolConnection,
     tableName: string,
     columnName: string,
     columnDefinition: string
-): void {
-    const columns = db.prepare(`PRAGMA table_info(${tableName})`).all() as TableColumnRow[];
-    if (columns.some((column) => column.name === columnName)) {
+): Promise<void> {
+    const [rows] = await conn.query<ColumnRow[]>(
+        `SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS
+         WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ? AND COLUMN_NAME = ?`,
+        [tableName, columnName]
+    );
+    if (rows.length > 0) {
         return;
     }
 
-    db.exec(`ALTER TABLE ${tableName} ADD COLUMN ${columnName} ${columnDefinition}`);
+    await conn.query(`ALTER TABLE ${tableName} ADD COLUMN ${columnName} ${columnDefinition}`);
 }
 
-function dropLegacyTables(db: Database.Database): void {
-    // Articles has been fully migrated to the local directory source model.
-    db.exec('DROP TABLE IF EXISTS Articles');
+async function dropLegacyTables(conn: PoolConnection): Promise<void> {
+    await conn.query('DROP TABLE IF EXISTS Articles');
 }
 
 // ════════════════════════════════════════════════════════════════
-// SQLite 建表 — 应用启动时调用 initDatabase(db) 自动执行
+// MySQL 建表 — 应用启动时调用 initDatabase(conn) 自动执行
 // ════════════════════════════════════════════════════════════════
 
-export function initDatabase(db: Database.Database): void {
-    dropLegacyTables(db);
+export async function initDatabase(conn: PoolConnection): Promise<void> {
+    await dropLegacyTables(conn);
 
-    db.exec(`
+    await conn.query(`
         CREATE TABLE IF NOT EXISTS Prompts (
-            Id              INTEGER PRIMARY KEY AUTOINCREMENT,
-            Title           TEXT    NOT NULL DEFAULT '',
-            RawTitle        TEXT    DEFAULT '',
-            Description     TEXT    DEFAULT '',
-            Content         TEXT    DEFAULT '',
-            Category        TEXT    DEFAULT 'multimodal-prompts',
-            Source          TEXT    DEFAULT NULL,
-            Author          TEXT    DEFAULT NULL,
-            SourceUrl       TEXT    DEFAULT NULL,
-            CoverImageUrl   TEXT    DEFAULT NULL,
-            VideoPreviewUrl TEXT    DEFAULT NULL,
-            CardPreviewVideoUrl TEXT DEFAULT NULL,
-            ImagesJson      TEXT    DEFAULT NULL,
-            CopyCount       INTEGER DEFAULT 0,
-            IsActive        INTEGER DEFAULT 1,
-            CreatedAt       TEXT    DEFAULT (datetime('now')),
-            UpdatedAt       TEXT    DEFAULT NULL
-        );
-
-        CREATE TABLE IF NOT EXISTS SystemLogs (
-            Id          INTEGER PRIMARY KEY AUTOINCREMENT,
-            Level       TEXT    NOT NULL DEFAULT 'info',
-            Source      TEXT    NOT NULL DEFAULT '',
-            Message     TEXT    NOT NULL DEFAULT '',
-            Detail      TEXT    DEFAULT NULL,
-            CreatedAt   TEXT    DEFAULT (datetime('now'))
-        );
-
-        CREATE INDEX IF NOT EXISTS idx_systemlogs_level     ON SystemLogs(Level);
-        CREATE INDEX IF NOT EXISTS idx_systemlogs_source    ON SystemLogs(Source);
-        CREATE INDEX IF NOT EXISTS idx_systemlogs_created   ON SystemLogs(CreatedAt);
+            Id              INT PRIMARY KEY AUTO_INCREMENT,
+            Title           VARCHAR(500) NOT NULL DEFAULT '',
+            RawTitle        VARCHAR(500) DEFAULT '',
+            Description     TEXT DEFAULT NULL,
+            Content         LONGTEXT DEFAULT NULL,
+            Category        VARCHAR(100) DEFAULT 'multimodal-prompts',
+            Source          VARCHAR(200) DEFAULT NULL,
+            Author          VARCHAR(200) DEFAULT NULL,
+            SourceUrl       VARCHAR(1000) DEFAULT NULL,
+            CoverImageUrl   VARCHAR(1000) DEFAULT NULL,
+            VideoPreviewUrl VARCHAR(1000) DEFAULT NULL,
+            CardPreviewVideoUrl VARCHAR(1000) DEFAULT NULL,
+            ImagesJson      LONGTEXT DEFAULT NULL,
+            CopyCount       INT DEFAULT 0,
+            IsActive        TINYINT(1) DEFAULT 1,
+            CreatedAt       DATETIME DEFAULT NOW(),
+            UpdatedAt       DATETIME DEFAULT NULL
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
     `);
 
-    ensureColumn(db, 'Prompts', 'Title', `TEXT NOT NULL DEFAULT ''`);
-    ensureColumn(db, 'Prompts', 'RawTitle', `TEXT DEFAULT ''`);
-    ensureColumn(db, 'Prompts', 'Description', `TEXT DEFAULT ''`);
-    ensureColumn(db, 'Prompts', 'Content', `TEXT DEFAULT ''`);
-    ensureColumn(db, 'Prompts', 'Category', `TEXT DEFAULT 'multimodal-prompts'`);
-    ensureColumn(db, 'Prompts', 'Source', 'TEXT DEFAULT NULL');
-    ensureColumn(db, 'Prompts', 'Author', 'TEXT DEFAULT NULL');
-    ensureColumn(db, 'Prompts', 'SourceUrl', 'TEXT DEFAULT NULL');
-    ensureColumn(db, 'Prompts', 'CoverImageUrl', 'TEXT DEFAULT NULL');
-    ensureColumn(db, 'Prompts', 'VideoPreviewUrl', 'TEXT DEFAULT NULL');
-    ensureColumn(db, 'Prompts', 'CardPreviewVideoUrl', 'TEXT DEFAULT NULL');
-    ensureColumn(db, 'Prompts', 'ImagesJson', 'TEXT DEFAULT NULL');
-    ensureColumn(db, 'Prompts', 'CopyCount', 'INTEGER DEFAULT 0');
-    ensureColumn(db, 'Prompts', 'IsActive', 'INTEGER DEFAULT 1');
-    ensureColumn(db, 'Prompts', 'CreatedAt', 'TEXT DEFAULT NULL');
-    ensureColumn(db, 'Prompts', 'UpdatedAt', 'TEXT DEFAULT NULL');
+    await conn.query(`
+        CREATE TABLE IF NOT EXISTS SystemLogs (
+            Id          INT PRIMARY KEY AUTO_INCREMENT,
+            Level       VARCHAR(20) NOT NULL DEFAULT 'info',
+            Source      VARCHAR(200) NOT NULL DEFAULT '',
+            Message     TEXT NOT NULL,
+            Detail      TEXT DEFAULT NULL,
+            CreatedAt   DATETIME DEFAULT NOW()
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+    `);
 
-    db.exec(`
+    await conn.query(`
+        CREATE INDEX idx_systemlogs_level   ON SystemLogs(Level);
+        CREATE INDEX idx_systemlogs_source  ON SystemLogs(Source);
+        CREATE INDEX idx_systemlogs_created ON SystemLogs(CreatedAt)
+    `);
+
+    await ensureColumn(conn, 'Prompts', 'Title', `VARCHAR(500) NOT NULL DEFAULT ''`);
+    await ensureColumn(conn, 'Prompts', 'RawTitle', `VARCHAR(500) DEFAULT ''`);
+    await ensureColumn(conn, 'Prompts', 'Description', `TEXT DEFAULT NULL`);
+    await ensureColumn(conn, 'Prompts', 'Content', `LONGTEXT DEFAULT NULL`);
+    await ensureColumn(conn, 'Prompts', 'Category', `VARCHAR(100) DEFAULT 'multimodal-prompts'`);
+    await ensureColumn(conn, 'Prompts', 'Source', `VARCHAR(200) DEFAULT NULL`);
+    await ensureColumn(conn, 'Prompts', 'Author', `VARCHAR(200) DEFAULT NULL`);
+    await ensureColumn(conn, 'Prompts', 'SourceUrl', `VARCHAR(1000) DEFAULT NULL`);
+    await ensureColumn(conn, 'Prompts', 'CoverImageUrl', `VARCHAR(1000) DEFAULT NULL`);
+    await ensureColumn(conn, 'Prompts', 'VideoPreviewUrl', `VARCHAR(1000) DEFAULT NULL`);
+    await ensureColumn(conn, 'Prompts', 'CardPreviewVideoUrl', `VARCHAR(1000) DEFAULT NULL`);
+    await ensureColumn(conn, 'Prompts', 'ImagesJson', `LONGTEXT DEFAULT NULL`);
+    await ensureColumn(conn, 'Prompts', 'CopyCount', `INT DEFAULT 0`);
+    await ensureColumn(conn, 'Prompts', 'IsActive', `TINYINT(1) DEFAULT 1`);
+    await ensureColumn(conn, 'Prompts', 'CreatedAt', `DATETIME DEFAULT NULL`);
+    await ensureColumn(conn, 'Prompts', 'UpdatedAt', `DATETIME DEFAULT NULL`);
+
+    await conn.query(`
         UPDATE Prompts
-        SET CreatedAt = datetime('now')
+        SET CreatedAt = NOW()
         WHERE CreatedAt IS NULL
     `);
 
-    db.exec(`
-        CREATE INDEX IF NOT EXISTS idx_prompts_created    ON Prompts(CreatedAt);
-        CREATE INDEX IF NOT EXISTS idx_prompts_category   ON Prompts(Category);
-        CREATE INDEX IF NOT EXISTS idx_prompts_active     ON Prompts(IsActive);
-        CREATE INDEX IF NOT EXISTS idx_prompts_sourceurl  ON Prompts(SourceUrl);
-        CREATE INDEX IF NOT EXISTS idx_prompts_rawtitle   ON Prompts(RawTitle);
+    await conn.query(`
+        CREATE INDEX idx_prompts_created   ON Prompts(CreatedAt);
+        CREATE INDEX idx_prompts_category  ON Prompts(Category);
+        CREATE INDEX idx_prompts_active    ON Prompts(IsActive);
+        CREATE INDEX idx_prompts_sourceurl ON Prompts(SourceUrl);
+        CREATE INDEX idx_prompts_rawtitle  ON Prompts(RawTitle)
     `);
 
     // ════════════════════════════════════════════════════════════════
     // 用户与认证
     // ════════════════════════════════════════════════════════════════
 
-    db.exec(`
+    await conn.query(`
         CREATE TABLE IF NOT EXISTS Users (
-            Id              TEXT PRIMARY KEY DEFAULT (lower(hex(randomblob(16)))),
-            Name            TEXT    NOT NULL DEFAULT '',
-            Email           TEXT    NOT NULL UNIQUE,
-            PasswordHash    TEXT    DEFAULT NULL,
-            AvatarUrl       TEXT    DEFAULT NULL,
-            Role            TEXT    NOT NULL DEFAULT 'user',
-            MembershipExpiresAt TEXT DEFAULT NULL,
-            EmailVerifiedAt TEXT    DEFAULT NULL,
-            CreatedAt       TEXT    DEFAULT (datetime('now')),
-            UpdatedAt       TEXT    DEFAULT NULL
-        );
-
-        CREATE INDEX IF NOT EXISTS idx_users_email ON Users(Email);
-        CREATE INDEX IF NOT EXISTS idx_users_role  ON Users(Role);
-
-        CREATE TABLE IF NOT EXISTS Sessions (
-            Id        INTEGER PRIMARY KEY AUTOINCREMENT,
-            Token     TEXT    NOT NULL UNIQUE,
-            UserId    TEXT    NOT NULL REFERENCES Users(Id),
-            ExpiresAt TEXT    NOT NULL,
-            CreatedAt TEXT    DEFAULT (datetime('now'))
-        );
-
-        CREATE INDEX IF NOT EXISTS idx_sessions_token    ON Sessions(Token);
-        CREATE INDEX IF NOT EXISTS idx_sessions_userId   ON Sessions(UserId);
-        CREATE INDEX IF NOT EXISTS idx_sessions_expires  ON Sessions(ExpiresAt);
-
-        CREATE TABLE IF NOT EXISTS OauthAccounts (
-            Id                INTEGER PRIMARY KEY AUTOINCREMENT,
-            Provider          TEXT    NOT NULL,
-            ProviderAccountId TEXT    NOT NULL,
-            UserId            TEXT    NOT NULL REFERENCES Users(Id),
-            CreatedAt         TEXT    DEFAULT (datetime('now')),
-            UNIQUE(Provider, ProviderAccountId)
-        );
-
-        CREATE INDEX IF NOT EXISTS idx_oauth_userId ON OauthAccounts(UserId);
-
-        CREATE TABLE IF NOT EXISTS EmailVerificationTokens (
-            Id        INTEGER PRIMARY KEY AUTOINCREMENT,
-            Token     TEXT    NOT NULL UNIQUE,
-            UserId    TEXT    NOT NULL REFERENCES Users(Id),
-            ExpiresAt TEXT    NOT NULL,
-            CreatedAt TEXT    DEFAULT (datetime('now'))
-        );
-
-        CREATE INDEX IF NOT EXISTS idx_emailverify_token ON EmailVerificationTokens(Token);
-
-        CREATE TABLE IF NOT EXISTS PasswordResetTokens (
-            Id        INTEGER PRIMARY KEY AUTOINCREMENT,
-            Token     TEXT    NOT NULL UNIQUE,
-            UserId    TEXT    NOT NULL REFERENCES Users(Id),
-            ExpiresAt TEXT    NOT NULL,
-            CreatedAt TEXT    DEFAULT (datetime('now'))
-        );
-
-        CREATE INDEX IF NOT EXISTS idx_pwdreset_token ON PasswordResetTokens(Token);
+            Id              VARCHAR(36) PRIMARY KEY,
+            Name            VARCHAR(200) NOT NULL DEFAULT '',
+            Email           VARCHAR(255) NOT NULL,
+            PasswordHash    VARCHAR(255) DEFAULT NULL,
+            AvatarUrl       VARCHAR(1000) DEFAULT NULL,
+            Role            VARCHAR(50) NOT NULL DEFAULT 'user',
+            MembershipExpiresAt DATETIME DEFAULT NULL,
+            EmailVerifiedAt DATETIME DEFAULT NULL,
+            CreatedAt       DATETIME DEFAULT NOW(),
+            UpdatedAt       DATETIME DEFAULT NULL,
+            UNIQUE INDEX idx_users_email (Email)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
     `);
 
-    ensureColumn(db, 'Users', 'MembershipExpiresAt', 'TEXT DEFAULT NULL');
+    await conn.query(`CREATE INDEX idx_users_role ON Users(Role)`);
 
-    db.exec(`
+    await conn.query(`
+        CREATE TABLE IF NOT EXISTS Sessions (
+            Id        INT PRIMARY KEY AUTO_INCREMENT,
+            Token     VARCHAR(200) NOT NULL,
+            UserId    VARCHAR(36) NOT NULL,
+            ExpiresAt DATETIME NOT NULL,
+            CreatedAt DATETIME DEFAULT NOW(),
+            UNIQUE INDEX idx_sessions_token (Token),
+            INDEX idx_sessions_userId (UserId),
+            INDEX idx_sessions_expires (ExpiresAt),
+            FOREIGN KEY (UserId) REFERENCES Users(Id)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+    `);
+
+    await conn.query(`
+        CREATE TABLE IF NOT EXISTS OauthAccounts (
+            Id                INT PRIMARY KEY AUTO_INCREMENT,
+            Provider          VARCHAR(50) NOT NULL,
+            ProviderAccountId VARCHAR(255) NOT NULL,
+            UserId            VARCHAR(36) NOT NULL,
+            CreatedAt         DATETIME DEFAULT NOW(),
+            UNIQUE INDEX idx_oauth_provider (Provider, ProviderAccountId),
+            INDEX idx_oauth_userId (UserId),
+            FOREIGN KEY (UserId) REFERENCES Users(Id)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+    `);
+
+    await conn.query(`
+        CREATE TABLE IF NOT EXISTS EmailVerificationTokens (
+            Id        INT PRIMARY KEY AUTO_INCREMENT,
+            Token     VARCHAR(200) NOT NULL,
+            UserId    VARCHAR(36) NOT NULL,
+            ExpiresAt DATETIME NOT NULL,
+            CreatedAt DATETIME DEFAULT NOW(),
+            UNIQUE INDEX idx_emailverify_token (Token),
+            FOREIGN KEY (UserId) REFERENCES Users(Id)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+    `);
+
+    await conn.query(`
+        CREATE TABLE IF NOT EXISTS PasswordResetTokens (
+            Id        INT PRIMARY KEY AUTO_INCREMENT,
+            Token     VARCHAR(200) NOT NULL,
+            UserId    VARCHAR(36) NOT NULL,
+            ExpiresAt DATETIME NOT NULL,
+            CreatedAt DATETIME DEFAULT NOW(),
+            UNIQUE INDEX idx_pwdreset_token (Token),
+            FOREIGN KEY (UserId) REFERENCES Users(Id)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+    `);
+
+    await ensureColumn(conn, 'Users', 'MembershipExpiresAt', 'DATETIME DEFAULT NULL');
+
+    await conn.query(`
         UPDATE Users
         SET Role = 'junior_member'
         WHERE Role = 'member'
@@ -173,41 +188,43 @@ export function initDatabase(db: Database.Database): void {
     // 会员邀请
     // ════════════════════════════════════════════════════════════════
 
-    db.exec(`
+    await conn.query(`
         CREATE TABLE IF NOT EXISTS InvitationCodes (
-            Id         INTEGER PRIMARY KEY AUTOINCREMENT,
-            Code       TEXT    NOT NULL UNIQUE,
-            TargetRole TEXT    NOT NULL DEFAULT 'junior_member',
-            MembershipDurationDays INTEGER NOT NULL DEFAULT 30,
-            MaxUses    INTEGER NOT NULL DEFAULT 1,
-            UsedCount  INTEGER NOT NULL DEFAULT 0,
-            ExpiresAt  TEXT    NOT NULL,
-            CreatedAt  TEXT    DEFAULT (datetime('now'))
-        );
-
-        CREATE INDEX IF NOT EXISTS idx_invite_code ON InvitationCodes(Code);
-
-        CREATE TABLE IF NOT EXISTS InvitationRedemptions (
-            Id                INTEGER PRIMARY KEY AUTOINCREMENT,
-            InvitationCodeId  INTEGER NOT NULL REFERENCES InvitationCodes(Id),
-            UserId            TEXT    NOT NULL REFERENCES Users(Id),
-            RedeemedAt        TEXT    DEFAULT (datetime('now')),
-            UNIQUE(InvitationCodeId, UserId)
-        );
-
-        CREATE INDEX IF NOT EXISTS idx_redemption_user ON InvitationRedemptions(UserId);
+            Id         INT PRIMARY KEY AUTO_INCREMENT,
+            Code       VARCHAR(50) NOT NULL,
+            TargetRole VARCHAR(50) NOT NULL DEFAULT 'junior_member',
+            MembershipDurationDays INT NOT NULL DEFAULT 30,
+            MaxUses    INT NOT NULL DEFAULT 1,
+            UsedCount  INT NOT NULL DEFAULT 0,
+            ExpiresAt  DATETIME NOT NULL,
+            CreatedAt  DATETIME DEFAULT NOW(),
+            UNIQUE INDEX idx_invite_code (Code)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
     `);
 
-    ensureColumn(db, 'InvitationCodes', 'TargetRole', `TEXT NOT NULL DEFAULT 'junior_member'`);
-    ensureColumn(db, 'InvitationCodes', 'MembershipDurationDays', 'INTEGER NOT NULL DEFAULT 30');
+    await conn.query(`
+        CREATE TABLE IF NOT EXISTS InvitationRedemptions (
+            Id                INT PRIMARY KEY AUTO_INCREMENT,
+            InvitationCodeId  INT NOT NULL,
+            UserId            VARCHAR(36) NOT NULL,
+            RedeemedAt        DATETIME DEFAULT NOW(),
+            UNIQUE INDEX idx_redemption_unique (InvitationCodeId, UserId),
+            INDEX idx_redemption_user (UserId),
+            FOREIGN KEY (InvitationCodeId) REFERENCES InvitationCodes(Id),
+            FOREIGN KEY (UserId) REFERENCES Users(Id)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+    `);
 
-    db.exec(`
+    await ensureColumn(conn, 'InvitationCodes', 'TargetRole', `VARCHAR(50) NOT NULL DEFAULT 'junior_member'`);
+    await ensureColumn(conn, 'InvitationCodes', 'MembershipDurationDays', 'INT NOT NULL DEFAULT 30');
+
+    await conn.query(`
         UPDATE InvitationCodes
         SET TargetRole = 'junior_member'
-        WHERE TargetRole IS NULL OR trim(TargetRole) = '' OR TargetRole = 'member'
+        WHERE TargetRole IS NULL OR TRIM(TargetRole) = '' OR TargetRole = 'member'
     `);
 
-    db.exec(`
+    await conn.query(`
         UPDATE InvitationCodes
         SET MembershipDurationDays = CASE
             WHEN TargetRole = 'founder_member' THEN ${999 * 365}
@@ -221,22 +238,21 @@ export function initDatabase(db: Database.Database): void {
     // 学院内容
     // ════════════════════════════════════════════════════════════════
 
-    db.exec(`
+    await conn.query(`
         CREATE TABLE IF NOT EXISTS AcademyContent (
-            Id           INTEGER PRIMARY KEY AUTOINCREMENT,
-            Slug         TEXT    NOT NULL UNIQUE,
-            Title        TEXT    NOT NULL,
-            Summary      TEXT    DEFAULT '',
-            Content      TEXT    DEFAULT '',
-            Category     TEXT    DEFAULT '',
-            CoverImageUrl TEXT   DEFAULT NULL,
-            Status       TEXT    NOT NULL DEFAULT 'draft',
-            PublishedAt  TEXT    DEFAULT NULL,
-            CreatedAt    TEXT    DEFAULT (datetime('now')),
-            UpdatedAt    TEXT    DEFAULT NULL
-        );
-
-        CREATE INDEX IF NOT EXISTS idx_academy_slug    ON AcademyContent(Slug);
-        CREATE INDEX IF NOT EXISTS idx_academy_status  ON AcademyContent(Status);
+            Id           INT PRIMARY KEY AUTO_INCREMENT,
+            Slug         VARCHAR(200) NOT NULL,
+            Title        VARCHAR(500) NOT NULL,
+            Summary      TEXT DEFAULT NULL,
+            Content      LONGTEXT DEFAULT NULL,
+            Category     VARCHAR(100) DEFAULT '',
+            CoverImageUrl VARCHAR(1000) DEFAULT NULL,
+            Status       VARCHAR(50) NOT NULL DEFAULT 'draft',
+            PublishedAt  DATETIME DEFAULT NULL,
+            CreatedAt    DATETIME DEFAULT NOW(),
+            UpdatedAt    DATETIME DEFAULT NULL,
+            UNIQUE INDEX idx_academy_slug (Slug),
+            INDEX idx_academy_status (Status)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
     `);
 }
