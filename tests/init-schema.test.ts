@@ -1,60 +1,96 @@
-import Database from 'better-sqlite3';
-import { describe, expect, it } from 'vitest';
+import mysql from 'mysql2/promise';
+import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
 import { initDatabase } from '@/lib/init-schema';
 
-function getTableNames(db: Database.Database): Array<{ name: string }> {
-    return db
-        .prepare(`
-            SELECT name
-            FROM sqlite_master
-            WHERE type = 'table' AND name NOT LIKE 'sqlite_%'
-            ORDER BY name
-        `)
-        .all() as Array<{ name: string }>;
-}
+const TEST_MYSQL_URL = process.env.MYSQL_URL;
 
-describe('initDatabase', () => {
-    it('removes the legacy Articles table while keeping active tables available', () => {
-        const db = new Database(':memory:');
-        db.exec(`
-            CREATE TABLE Articles (
-                Id INTEGER PRIMARY KEY AUTOINCREMENT,
-                Title TEXT NOT NULL DEFAULT ''
-            );
-        `);
+describe.skipIf(!TEST_MYSQL_URL)('initDatabase', () => {
+    let adminConn: mysql.Connection;
 
-        initDatabase(db);
-
-        const tableNames = getTableNames(db).map((row) => row.name);
-        expect(tableNames).not.toContain('Articles');
-        expect(tableNames).toContain('Prompts');
-        expect(tableNames).toContain('SystemLogs');
-
-        db.close();
+    beforeAll(async () => {
+        adminConn = await mysql.createConnection(TEST_MYSQL_URL!);
     });
 
-    it('migrates legacy member roles to junior_member during initialization', () => {
-        const db = new Database(':memory:');
-        initDatabase(db);
+    afterAll(async () => {
+        await adminConn.end();
+    });
 
-        db.prepare(
-            `INSERT INTO Users (Id, Name, Email, Role)
-             VALUES ('user-1', 'Legacy Member', 'legacy-member@example.com', 'member')`,
-        ).run();
-        db.prepare(
-            `INSERT INTO InvitationCodes (Code, TargetRole, ExpiresAt)
-             VALUES ('LEGACY-001', 'member', '2099-01-01 00:00:00')`,
-        ).run();
+    async function getTableNames(conn: mysql.Connection): Promise<string[]> {
+        const [rows] = await conn.query<Array<{ TABLE_NAME: string }>>(
+            `SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES
+             WHERE TABLE_SCHEMA = DATABASE()
+             ORDER BY TABLE_NAME`,
+        );
+        return rows.map((row) => row.TABLE_NAME);
+    }
 
-        initDatabase(db);
+    it('removes the legacy Articles table while keeping active tables available', async () => {
+        const dbName = `mockingbird_test_${Date.now()}_articles`;
 
-        expect(db.prepare(`SELECT Role FROM Users WHERE Id = 'user-1'`).get()).toEqual({
-            Role: 'junior_member',
-        });
-        expect(db.prepare(`SELECT TargetRole FROM InvitationCodes WHERE Code = 'LEGACY-001'`).get()).toEqual({
-            TargetRole: 'junior_member',
-        });
+        await adminConn.query(`CREATE DATABASE ${dbName}`);
+        const conn = await mysql.createConnection({ ...parseMySqlUrl(TEST_MYSQL_URL!), database: dbName });
 
-        db.close();
+        try {
+            await conn.query(`
+                CREATE TABLE Articles (
+                    Id INT PRIMARY KEY AUTO_INCREMENT,
+                    Title VARCHAR(500) NOT NULL DEFAULT ''
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+            `);
+
+            await initDatabase(conn);
+
+            const tableNames = await getTableNames(conn);
+            expect(tableNames).not.toContain('Articles');
+            expect(tableNames).toContain('Prompts');
+            expect(tableNames).toContain('SystemLogs');
+        } finally {
+            await conn.end();
+            await adminConn.query(`DROP DATABASE ${dbName}`);
+        }
+    });
+
+    it('migrates legacy member roles to junior_member during initialization', async () => {
+        const dbName = `mockingbird_test_${Date.now()}_roles`;
+
+        await adminConn.query(`CREATE DATABASE ${dbName}`);
+        const conn = await mysql.createConnection({ ...parseMySqlUrl(TEST_MYSQL_URL!), database: dbName });
+
+        try {
+            await initDatabase(conn);
+
+            await conn.query(
+                `INSERT INTO Users (Id, Name, Email, Role) VALUES ('user-1', 'Legacy Member', 'legacy-member@example.com', 'member')`,
+            );
+            await conn.query(
+                `INSERT INTO InvitationCodes (Code, TargetRole, ExpiresAt) VALUES ('LEGACY-001', 'member', '2099-01-01 00:00:00')`,
+            );
+
+            // Re-run init to trigger migration
+            await initDatabase(conn);
+
+            const [userRows] = await conn.query<Array<{ Role: string }>>(
+                `SELECT Role FROM Users WHERE Id = 'user-1'`,
+            );
+            expect(userRows[0].Role).toBe('junior_member');
+
+            const [inviteRows] = await conn.query<Array<{ TargetRole: string }>>(
+                `SELECT TargetRole FROM InvitationCodes WHERE Code = 'LEGACY-001'`,
+            );
+            expect(inviteRows[0].TargetRole).toBe('junior_member');
+        } finally {
+            await conn.end();
+            await adminConn.query(`DROP DATABASE ${dbName}`);
+        }
     });
 });
+
+function parseMySqlUrl(url: string): { host: string; port: number; user: string; password: string } {
+    const parsed = new URL(url);
+    return {
+        host: parsed.hostname,
+        port: parseInt(parsed.port || '3306', 10),
+        user: decodeURIComponent(parsed.username),
+        password: decodeURIComponent(parsed.password),
+    };
+}
