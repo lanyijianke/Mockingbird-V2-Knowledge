@@ -21,6 +21,7 @@
     "cheerio": "^1.2.0",
     "csv-parse": "^6.1.0",
     "gray-matter": "^4.0.3",
+    "mysql2": "^3.22.3",
     "nanoid": "^5.1.9",
     "next": "16.1.6",
     "node-cron": "^4.2.1",
