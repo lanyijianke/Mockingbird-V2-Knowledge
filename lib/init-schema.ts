@@ -4,6 +4,22 @@ interface ColumnRow {
     COLUMN_NAME: string;
 }
 
+async function ensureIndex(
+    conn: PoolConnection,
+    indexName: string,
+    sql: string,
+): Promise<void> {
+    const [rows] = await conn.query<ColumnRow[]>(
+        `SELECT INDEX_NAME FROM INFORMATION_SCHEMA.STATISTICS
+         WHERE TABLE_SCHEMA = DATABASE() AND INDEX_NAME = ?`,
+        [indexName],
+    );
+    if (rows.length > 0) {
+        return;
+    }
+    await conn.query(sql);
+}
+
 async function ensureColumn(
     conn: PoolConnection,
     tableName: string,
@@ -66,11 +82,9 @@ export async function initDatabase(conn: PoolConnection): Promise<void> {
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
     `);
 
-    await conn.query(`
-        CREATE INDEX idx_systemlogs_level   ON SystemLogs(Level);
-        CREATE INDEX idx_systemlogs_source  ON SystemLogs(Source);
-        CREATE INDEX idx_systemlogs_created ON SystemLogs(CreatedAt)
-    `);
+    await ensureIndex(conn, 'idx_systemlogs_level', `CREATE INDEX idx_systemlogs_level ON SystemLogs(Level)`);
+    await ensureIndex(conn, 'idx_systemlogs_source', `CREATE INDEX idx_systemlogs_source ON SystemLogs(Source)`);
+    await ensureIndex(conn, 'idx_systemlogs_created', `CREATE INDEX idx_systemlogs_created ON SystemLogs(CreatedAt)`);
 
     await ensureColumn(conn, 'Prompts', 'Title', `VARCHAR(500) NOT NULL DEFAULT ''`);
     await ensureColumn(conn, 'Prompts', 'RawTitle', `VARCHAR(500) DEFAULT ''`);
@@ -95,13 +109,11 @@ export async function initDatabase(conn: PoolConnection): Promise<void> {
         WHERE CreatedAt IS NULL
     `);
 
-    await conn.query(`
-        CREATE INDEX idx_prompts_created   ON Prompts(CreatedAt);
-        CREATE INDEX idx_prompts_category  ON Prompts(Category);
-        CREATE INDEX idx_prompts_active    ON Prompts(IsActive);
-        CREATE INDEX idx_prompts_sourceurl ON Prompts(SourceUrl);
-        CREATE INDEX idx_prompts_rawtitle  ON Prompts(RawTitle)
-    `);
+    await ensureIndex(conn, 'idx_prompts_created', `CREATE INDEX idx_prompts_created ON Prompts(CreatedAt)`);
+    await ensureIndex(conn, 'idx_prompts_category', `CREATE INDEX idx_prompts_category ON Prompts(Category)`);
+    await ensureIndex(conn, 'idx_prompts_active', `CREATE INDEX idx_prompts_active ON Prompts(IsActive)`);
+    await ensureIndex(conn, 'idx_prompts_sourceurl', `CREATE INDEX idx_prompts_sourceurl ON Prompts(SourceUrl(255))`);
+    await ensureIndex(conn, 'idx_prompts_rawtitle', `CREATE INDEX idx_prompts_rawtitle ON Prompts(RawTitle)`);
 
     // ════════════════════════════════════════════════════════════════
     // 用户与认证
@@ -123,7 +135,7 @@ export async function initDatabase(conn: PoolConnection): Promise<void> {
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
     `);
 
-    await conn.query(`CREATE INDEX idx_users_role ON Users(Role)`);
+    await ensureIndex(conn, 'idx_users_role', `CREATE INDEX idx_users_role ON Users(Role)`);
 
     await conn.query(`
         CREATE TABLE IF NOT EXISTS Sessions (

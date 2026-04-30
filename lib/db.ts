@@ -9,6 +9,19 @@ type QueryParams = (string | number | boolean | null | Buffer | Date)[];
 
 let pool: mysql.Pool | null = null;
 
+// MySQL DATETIME columns return Date objects; SQLite stored them as strings.
+// Normalize to ISO strings so the rest of the codebase works unchanged.
+function serializeRow(row: Record<string, unknown>): Record<string, unknown> {
+    for (const key of Object.keys(row)) {
+        if (row[key] instanceof Date) {
+            const d = row[key] as Date;
+            const pad = (n: number) => String(n).padStart(2, '0');
+            row[key] = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+        }
+    }
+    return row;
+}
+
 async function getPool(): Promise<mysql.Pool> {
     if (!pool) {
         const url = process.env.MYSQL_URL;
@@ -42,7 +55,7 @@ export async function query<T = Record<string, unknown>>(
     params?: QueryParams
 ): Promise<T[]> {
     const [rows] = await (await getPool()).query(sql, params);
-    return rows as T[];
+    return (rows as Record<string, unknown>[]).map(serializeRow) as T[];
 }
 
 /**
@@ -53,7 +66,7 @@ export async function queryOne<T = Record<string, unknown>>(
     params?: QueryParams
 ): Promise<T | null> {
     const [rows] = await (await getPool()).query(sql, params);
-    const arr = rows as T[];
+    const arr = (rows as Record<string, unknown>[]).map(serializeRow) as T[];
     return arr.length > 0 ? arr[0] : null;
 }
 
@@ -65,7 +78,7 @@ export async function queryScalar<T = number>(
     params?: QueryParams
 ): Promise<T | null> {
     const [rows] = await (await getPool()).query(sql, params);
-    const arr = rows as Record<string, unknown>[];
+    const arr = (rows as Record<string, unknown>[]).map(serializeRow);
     if (arr.length === 0) return null;
     return arr[0][Object.keys(arr[0])[0]] as T;
 }
