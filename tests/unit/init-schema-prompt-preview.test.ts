@@ -1,44 +1,71 @@
-import Database from 'better-sqlite3';
-import { afterEach, describe, expect, it } from 'vitest';
+import mysql from 'mysql2/promise';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { initDatabase } from '@/lib/init-schema';
 
-describe('initDatabase prompt preview migration', () => {
-    const databases: Database.Database[] = [];
+const TEST_MYSQL_URL = process.env.MYSQL_URL;
 
-    afterEach(() => {
-        for (const db of databases) {
-            db.close();
-        }
-        databases.length = 0;
+describe.skipIf(!TEST_MYSQL_URL)('initDatabase prompt preview migration', () => {
+    let adminConn: mysql.Connection;
+
+    beforeAll(async () => {
+        adminConn = await mysql.createConnection(TEST_MYSQL_URL!);
     });
 
-    it('adds CardPreviewVideoUrl to an existing Prompts table without dropping data', () => {
-        const db = new Database(':memory:');
-        databases.push(db);
+    afterAll(async () => {
+        await adminConn.end();
+    });
 
-        db.exec(`
-            CREATE TABLE Prompts (
-                Id INTEGER PRIMARY KEY AUTOINCREMENT,
-                Title TEXT NOT NULL DEFAULT '',
-                VideoPreviewUrl TEXT DEFAULT NULL
+    it('adds CardPreviewVideoUrl to an existing Prompts table without dropping data', async () => {
+        const dbName = `mockingbird_test_${Date.now()}_preview`;
+
+        await adminConn.query(`CREATE DATABASE ${dbName}`);
+        const conn = await mysql.createConnection({ ...parseMySqlUrl(TEST_MYSQL_URL!), database: dbName });
+
+        try {
+            // Create a minimal Prompts table without CardPreviewVideoUrl
+            await conn.query(`
+                CREATE TABLE Prompts (
+                    Id INT PRIMARY KEY AUTO_INCREMENT,
+                    Title VARCHAR(500) NOT NULL DEFAULT '',
+                    VideoPreviewUrl VARCHAR(1000) DEFAULT NULL
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+            `);
+            await conn.query(
+                `INSERT INTO Prompts (Title, VideoPreviewUrl) VALUES ('existing prompt', '/content/prompts/media/full.mp4')`,
             );
-            INSERT INTO Prompts (Title, VideoPreviewUrl) VALUES ('existing prompt', '/content/prompts/media/full.mp4');
-        `);
 
-        initDatabase(db);
+            await initDatabase(conn);
 
-        const columns = db.prepare('PRAGMA table_info(Prompts)').all() as Array<{ name: string }>;
-        const row = db.prepare('SELECT Title, VideoPreviewUrl, CardPreviewVideoUrl FROM Prompts').get() as {
-            Title: string;
-            VideoPreviewUrl: string | null;
-            CardPreviewVideoUrl: string | null;
-        };
+            // Verify CardPreviewVideoUrl column exists via INFORMATION_SCHEMA
+            const [colRows] = await conn.query<Array<{ COLUMN_NAME: string }>>(
+                `SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS
+                 WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'Prompts' AND COLUMN_NAME = 'CardPreviewVideoUrl'`,
+            );
+            expect(colRows.length).toBeGreaterThan(0);
 
-        expect(columns.map((column) => column.name)).toContain('CardPreviewVideoUrl');
-        expect(row).toEqual({
-            Title: 'existing prompt',
-            VideoPreviewUrl: '/content/prompts/media/full.mp4',
-            CardPreviewVideoUrl: null,
-        });
+            // Verify existing data is preserved
+            const [dataRows] = await conn.query<
+                Array<{ Title: string; VideoPreviewUrl: string | null; CardPreviewVideoUrl: string | null }>
+            >(`SELECT Title, VideoPreviewUrl, CardPreviewVideoUrl FROM Prompts LIMIT 1`);
+
+            expect(dataRows[0]).toEqual({
+                Title: 'existing prompt',
+                VideoPreviewUrl: '/content/prompts/media/full.mp4',
+                CardPreviewVideoUrl: null,
+            });
+        } finally {
+            await conn.end();
+            await adminConn.query(`DROP DATABASE ${dbName}`);
+        }
     });
 });
+
+function parseMySqlUrl(url: string): { host: string; port: number; user: string; password: string } {
+    const parsed = new URL(url);
+    return {
+        host: parsed.hostname,
+        port: parseInt(parsed.port || '3306', 10),
+        user: decodeURIComponent(parsed.username),
+        password: decodeURIComponent(parsed.password),
+    };
+}
