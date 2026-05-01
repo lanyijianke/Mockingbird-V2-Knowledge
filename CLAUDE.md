@@ -54,7 +54,7 @@ npm run invite:generate  # Generate membership invite codes
 
 ### Content sources
 - **Articles:** Local markdown directories with frontmatter, multi-site support (`ai`, `finance`), served via manifest-based indexing
-- **Prompts:** Synced from GitHub repos into SQLite, configured in `content-sources/prompts/*.json`
+- **Prompts:** Synced from GitHub repos into MySQL, configured in `content-sources/prompts/*.json`
 - **Rankings:** Scraped from GitHub Trending, ProductHunt, Skills.sh, cached 2 hours
 
 ### API routes (`app/api/`)
@@ -67,7 +67,7 @@ npm run invite:generate  # Generate membership invite codes
 
 ## Conventions
 
-- All API routes use `export const runtime = 'nodejs'` for SQLite access
+- All API routes use `export const runtime = 'nodejs'` for MySQL access
 - **4-space** indentation in `lib/` and route handlers; **2-space** in React components — match surrounding file style
 - Reuse centralized config (`lib/site-config.ts`, `lib/seo/config.ts`) for brand names, URLs, callbacks
 - Conventional commits: `feat:`, `fix:`, `chore:`, `docs:`, `refactor:`

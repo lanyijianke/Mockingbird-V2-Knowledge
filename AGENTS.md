@@ -13,7 +13,7 @@
 - `npm test -- tests/unit/auth-routes.test.ts` runs a focused test file during iteration.
 
 ## Coding Style & Naming Conventions
-- Use TypeScript throughout. Keep `runtime = 'nodejs'` on API routes that touch SQLite or other Node-only dependencies.
+- Use TypeScript throughout. Keep `runtime = 'nodejs'` on API routes that touch MySQL or other Node-only dependencies.
 - Follow existing style: 4-space indentation in `lib/` and route handlers, 2-space indentation in many React components; preserve the surrounding file’s style instead of reformatting unrelated code.
 - Prefer descriptive PascalCase for React components, camelCase for helpers, and kebab-free route filenames (`route.ts`, `page.tsx`, `layout.tsx`).
 - Reuse centralized config (`lib/site-config.ts`, `lib/seo/config.ts`) instead of hardcoding brand names, URLs, or callback origins.
@@ -21,7 +21,7 @@
 ## Testing Guidelines
 - Framework: Vitest (`tests/**/*.test.ts`).
 - Add regression tests for behavior changes, especially auth, SEO metadata, sitemap output, and route handlers.
-- Prefer route-level tests for API behavior and keep temporary DB state isolated with temp `SQLITE_DB_PATH` files.
+- Prefer route-level tests for API behavior and keep temporary DB state isolated with per-test MySQL databases.
 
 ## Commit & Pull Request Guidelines
 - Follow the repository’s existing conventional style: `feat: ...`, `fix: ...`, `chore: ...`, `docs: ...`, `refactor: ...`.

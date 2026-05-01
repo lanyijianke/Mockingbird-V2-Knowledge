@@ -3,7 +3,7 @@ import { writeLog, serializeError, type LogLevel as DbLogLevel } from '@/lib/ser
 // ════════════════════════════════════════════════════════════════
 // 统一日志工具 — 替代散布各处的 console.log/warn/error
 // 支持日志级别控制 (LOG_LEVEL 环境变量)
-// warn/error 级别自动持久化到 SQLite SystemLogs 表
+// warn/error 级别自动持久化到 MySQL SystemLogs 表
 // ════════════════════════════════════════════════════════════════
 
 type LogLevel = 'debug' | 'info' | 'warn' | 'error' | 'silent';

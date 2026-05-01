@@ -1,15 +1,11 @@
-import type { PoolConnection } from 'mysql2/promise';
-
-interface ColumnRow {
-    COLUMN_NAME: string;
-}
+import type { PoolConnection, RowDataPacket } from 'mysql2/promise';
 
 async function ensureIndex(
     conn: PoolConnection,
     indexName: string,
     sql: string,
 ): Promise<void> {
-    const [rows] = await conn.query<ColumnRow[]>(
+    const [rows] = await conn.query<RowDataPacket[]>(
         `SELECT INDEX_NAME FROM INFORMATION_SCHEMA.STATISTICS
          WHERE TABLE_SCHEMA = DATABASE() AND INDEX_NAME = ?`,
         [indexName],
@@ -26,7 +22,7 @@ async function ensureColumn(
     columnName: string,
     columnDefinition: string
 ): Promise<void> {
-    const [rows] = await conn.query<ColumnRow[]>(
+    const [rows] = await conn.query<RowDataPacket[]>(
         `SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS
          WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ? AND COLUMN_NAME = ?`,
         [tableName, columnName]

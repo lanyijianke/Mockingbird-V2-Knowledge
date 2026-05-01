@@ -9,8 +9,7 @@ type QueryParams = (string | number | boolean | null | Buffer | Date)[];
 
 let pool: mysql.Pool | null = null;
 
-// MySQL DATETIME columns return Date objects; SQLite stored them as strings.
-// Normalize to ISO strings so the rest of the codebase works unchanged.
+// MySQL DATETIME columns return Date objects; normalize to YYYY-MM-DD HH:mm:ss strings.
 function serializeRow(row: Record<string, unknown>): Record<string, unknown> {
     for (const key of Object.keys(row)) {
         if (row[key] instanceof Date) {
@@ -29,7 +28,8 @@ async function getPool(): Promise<mysql.Pool> {
             throw new Error('MYSQL_URL 环境变量未设置');
         }
 
-        pool = mysql.createPool(url, {
+        pool = mysql.createPool({
+            uri: url,
             waitForConnections: true,
             connectionLimit: 10,
             charset: 'utf8mb4',

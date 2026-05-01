@@ -1,4 +1,4 @@
-import mysql from 'mysql2/promise';
+import mysql, { type RowDataPacket, type PoolConnection } from 'mysql2/promise';
 import bcrypt from 'bcryptjs';
 import crypto from 'node:crypto';
 import { NextRequest } from 'next/server';
@@ -41,7 +41,7 @@ describe.skipIf(!TEST_MYSQL_URL)('auth routes', () => {
 
     async function setupDatabase(dbName: string): Promise<mysql.Connection> {
         const conn = await mysql.createConnection({ ...parseMySqlUrl(TEST_MYSQL_URL!), database: dbName });
-        await initDatabase(conn);
+        await initDatabase(conn as unknown as PoolConnection);
         return conn;
     }
 
@@ -92,13 +92,13 @@ describe.skipIf(!TEST_MYSQL_URL)('auth routes', () => {
         // Verify via direct connection
         const verifyConn = await mysql.createConnection({ ...parseMySqlUrl(TEST_MYSQL_URL!), database: dbName });
         try {
-            const [userRows] = await verifyConn.query<
-                Array<{ Id: string; Email: string; Name: string; PasswordHash: string }>
-            >(`SELECT Id, Email, Name, PasswordHash FROM Users WHERE Email = 'new-user@example.com'`);
-            const [tokenRows] = await verifyConn.query<
-                Array<{ Token: string; UserId: string }>
-            >(`SELECT Token, UserId FROM EmailVerificationTokens LIMIT 1`);
-            const [sessionCount] = await verifyConn.query<Array<{ count: number }>>(
+            const [userRows] = await verifyConn.query<RowDataPacket[]>(
+                `SELECT Id, Email, Name, PasswordHash FROM Users WHERE Email = 'new-user@example.com'`,
+            );
+            const [tokenRows] = await verifyConn.query<RowDataPacket[]>(
+                `SELECT Token, UserId FROM EmailVerificationTokens LIMIT 1`,
+            );
+            const [sessionCount] = await verifyConn.query<RowDataPacket[]>(
                 `SELECT COUNT(*) AS count FROM Sessions`,
             );
 
@@ -155,9 +155,10 @@ describe.skipIf(!TEST_MYSQL_URL)('auth routes', () => {
         // Verify session via direct connection
         const verifyConn = await mysql.createConnection({ ...parseMySqlUrl(TEST_MYSQL_URL!), database: dbName });
         try {
-            const [sessionRows] = await verifyConn.query<
-                Array<{ Token: string; UserId: string }>
-            >(`SELECT Token, UserId FROM Sessions WHERE UserId = ?`, [userId]);
+            const [sessionRows] = await verifyConn.query<RowDataPacket[]>(
+                `SELECT Token, UserId FROM Sessions WHERE UserId = ?`,
+                [userId],
+            );
 
             expect(response.status).toBe(200);
             expect(body).toMatchObject({
@@ -208,7 +209,7 @@ describe.skipIf(!TEST_MYSQL_URL)('auth routes', () => {
         // Verify no session via direct connection
         const verifyConn = await mysql.createConnection({ ...parseMySqlUrl(TEST_MYSQL_URL!), database: dbName });
         try {
-            const [sessionCount] = await verifyConn.query<Array<{ count: number }>>(
+            const [sessionCount] = await verifyConn.query<RowDataPacket[]>(
                 `SELECT COUNT(*) AS count FROM Sessions`,
             );
 

@@ -1,6 +1,6 @@
 ---
 name: knowledge-invite-codes
-description: Generate membership invite codes for the Knowledge project with the correct role, term, invite expiry, and SQLite fields.
+description: Generate membership invite codes for the Knowledge project with the correct role, term, invite expiry, and DB fields.
 ---
 
 # knowledge-invite-codes

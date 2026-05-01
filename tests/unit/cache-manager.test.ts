@@ -114,7 +114,7 @@ describe('CacheManager', () => {
     it('keeps the previous value when the refresh result is empty and replacement is disabled', async () => {
         const loader = vi.fn()
             .mockResolvedValueOnce(['kept'])
-            .mockResolvedValueOnce<string[]>([]);
+            .mockResolvedValueOnce([]);
 
         await expect(
             manager.getOrLoad(preserveEmptyPolicy, ['alpha'], loader)

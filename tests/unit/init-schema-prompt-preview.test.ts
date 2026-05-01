@@ -1,4 +1,4 @@
-import mysql from 'mysql2/promise';
+import mysql, { type RowDataPacket, type PoolConnection } from 'mysql2/promise';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { initDatabase } from '@/lib/init-schema';
 
@@ -34,19 +34,19 @@ describe.skipIf(!TEST_MYSQL_URL)('initDatabase prompt preview migration', () => 
                 `INSERT INTO Prompts (Title, VideoPreviewUrl) VALUES ('existing prompt', '/content/prompts/media/full.mp4')`,
             );
 
-            await initDatabase(conn);
+            await initDatabase(conn as unknown as PoolConnection);
 
             // Verify CardPreviewVideoUrl column exists via INFORMATION_SCHEMA
-            const [colRows] = await conn.query<Array<{ COLUMN_NAME: string }>>(
+            const [colRows] = await conn.query<RowDataPacket[]>(
                 `SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS
                  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'Prompts' AND COLUMN_NAME = 'CardPreviewVideoUrl'`,
             );
             expect(colRows.length).toBeGreaterThan(0);
 
             // Verify existing data is preserved
-            const [dataRows] = await conn.query<
-                Array<{ Title: string; VideoPreviewUrl: string | null; CardPreviewVideoUrl: string | null }>
-            >(`SELECT Title, VideoPreviewUrl, CardPreviewVideoUrl FROM Prompts LIMIT 1`);
+            const [dataRows] = await conn.query<RowDataPacket[]>(
+                `SELECT Title, VideoPreviewUrl, CardPreviewVideoUrl FROM Prompts LIMIT 1`,
+            );
 
             expect(dataRows[0]).toEqual({
                 Title: 'existing prompt',

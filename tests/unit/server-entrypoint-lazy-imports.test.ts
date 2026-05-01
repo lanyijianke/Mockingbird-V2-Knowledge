@@ -11,7 +11,7 @@ vi.mock('next/link', async () => {
     const React = await import('react');
     return {
         default: ({ href, children, ...props }: Record<string, unknown>) =>
-            React.createElement('a', { href, ...props }, children),
+            React.createElement('a', { href, ...props }, children as any),
     };
 });
 

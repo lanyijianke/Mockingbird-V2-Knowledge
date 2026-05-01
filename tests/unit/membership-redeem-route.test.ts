@@ -1,4 +1,4 @@
-import mysql from 'mysql2/promise';
+import mysql, { type RowDataPacket, type PoolConnection } from 'mysql2/promise';
 import crypto from 'node:crypto';
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { initDatabase } from '@/lib/init-schema';
@@ -39,7 +39,7 @@ describe.skipIf(!TEST_MYSQL_URL)('POST /api/membership/redeem', () => {
 
     async function setupDatabase(dbName: string): Promise<mysql.Connection> {
         const conn = await mysql.createConnection({ ...parseMySqlUrl(TEST_MYSQL_URL!), database: dbName });
-        await initDatabase(conn);
+        await initDatabase(conn as unknown as PoolConnection);
         return conn;
     }
 
@@ -89,11 +89,11 @@ describe.skipIf(!TEST_MYSQL_URL)('POST /api/membership/redeem', () => {
         // Verify via direct connection
         const verifyConn = await mysql.createConnection({ ...parseMySqlUrl(TEST_MYSQL_URL!), database: dbName });
         try {
-            const [userRows] = await verifyConn.query<Array<{ Role: string }>>(
+            const [userRows] = await verifyConn.query<RowDataPacket[]>(
                 `SELECT Role FROM Users WHERE Id = ?`,
                 [userId],
             );
-            const [inviteRows] = await verifyConn.query<Array<{ UsedCount: number }>>(
+            const [inviteRows] = await verifyConn.query<RowDataPacket[]>(
                 `SELECT UsedCount FROM InvitationCodes WHERE Code = 'JUNIOR-001'`,
             );
 
@@ -139,7 +139,7 @@ describe.skipIf(!TEST_MYSQL_URL)('POST /api/membership/redeem', () => {
 
         const verifyConn = await mysql.createConnection({ ...parseMySqlUrl(TEST_MYSQL_URL!), database: dbName });
         try {
-            const [userRows] = await verifyConn.query<Array<{ Role: string }>>(
+            const [userRows] = await verifyConn.query<RowDataPacket[]>(
                 `SELECT Role FROM Users WHERE Id = ?`,
                 [userId],
             );
@@ -185,11 +185,11 @@ describe.skipIf(!TEST_MYSQL_URL)('POST /api/membership/redeem', () => {
 
         const verifyConn = await mysql.createConnection({ ...parseMySqlUrl(TEST_MYSQL_URL!), database: dbName });
         try {
-            const [userRows] = await verifyConn.query<Array<{ Role: string }>>(
+            const [userRows] = await verifyConn.query<RowDataPacket[]>(
                 `SELECT Role FROM Users WHERE Id = ?`,
                 [userId],
             );
-            const [inviteRows] = await verifyConn.query<Array<{ UsedCount: number }>>(
+            const [inviteRows] = await verifyConn.query<RowDataPacket[]>(
                 `SELECT UsedCount FROM InvitationCodes WHERE Code = 'JUNIOR-002'`,
             );
 
@@ -232,7 +232,7 @@ describe.skipIf(!TEST_MYSQL_URL)('POST /api/membership/redeem', () => {
 
         const verifyConn = await mysql.createConnection({ ...parseMySqlUrl(TEST_MYSQL_URL!), database: dbName });
         try {
-            const [userRows] = await verifyConn.query<Array<{ Role: string }>>(
+            const [userRows] = await verifyConn.query<RowDataPacket[]>(
                 `SELECT Role FROM Users WHERE Id = ?`,
                 [userId],
             );
@@ -280,12 +280,13 @@ describe.skipIf(!TEST_MYSQL_URL)('POST /api/membership/redeem', () => {
 
         const verifyConn = await mysql.createConnection({ ...parseMySqlUrl(TEST_MYSQL_URL!), database: dbName });
         try {
-            const [userRows] = await verifyConn.query<
-                Array<{ Role: string; MembershipExpiresAt: string | null }>
-            >(`SELECT Role, MembershipExpiresAt FROM Users WHERE Id = ?`, [userId]);
-            const [inviteRows] = await verifyConn.query<
-                Array<{ ExpiresAt: string; UsedCount: number }>
-            >(`SELECT ExpiresAt, UsedCount FROM InvitationCodes WHERE Code = 'YEARLY-001'`);
+            const [userRows] = await verifyConn.query<RowDataPacket[]>(
+                `SELECT Role, MembershipExpiresAt FROM Users WHERE Id = ?`,
+                [userId],
+            );
+            const [inviteRows] = await verifyConn.query<RowDataPacket[]>(
+                `SELECT ExpiresAt, UsedCount FROM InvitationCodes WHERE Code = 'YEARLY-001'`,
+            );
 
             const userRow = userRows[0];
             const inviteRow = inviteRows[0];
@@ -304,7 +305,7 @@ describe.skipIf(!TEST_MYSQL_URL)('POST /api/membership/redeem', () => {
                 afterRedeem + 365 * 86400_000 + 60_000,
             );
             expect(inviteRow.UsedCount).toBe(1);
-            expect(inviteRow.ExpiresAt instanceof Date || typeof inviteRow.ExpiresAt === 'string').toBe(true);
+            expect(inviteRow.ExpiresAt instanceof Date || typeof (inviteRow.ExpiresAt as string) === 'string').toBe(true);
         } finally {
             await verifyConn.end();
         }
@@ -340,7 +341,7 @@ describe.skipIf(!TEST_MYSQL_URL)('POST /api/membership/redeem', () => {
 
         const verifyConn = await mysql.createConnection({ ...parseMySqlUrl(TEST_MYSQL_URL!), database: dbName });
         try {
-            const [userRows] = await verifyConn.query<Array<{ Role: string }>>(
+            const [userRows] = await verifyConn.query<RowDataPacket[]>(
                 `SELECT Role FROM Users WHERE Id = ?`,
                 [userId],
             );
@@ -386,11 +387,11 @@ describe.skipIf(!TEST_MYSQL_URL)('POST /api/membership/redeem', () => {
 
         const verifyConn = await mysql.createConnection({ ...parseMySqlUrl(TEST_MYSQL_URL!), database: dbName });
         try {
-            const [userRows] = await verifyConn.query<Array<{ Role: string }>>(
+            const [userRows] = await verifyConn.query<RowDataPacket[]>(
                 `SELECT Role FROM Users WHERE Id = ?`,
                 [userId],
             );
-            const [inviteRows] = await verifyConn.query<Array<{ UsedCount: number }>>(
+            const [inviteRows] = await verifyConn.query<RowDataPacket[]>(
                 `SELECT UsedCount FROM InvitationCodes WHERE Code = 'JUNIOR-003'`,
             );
 
