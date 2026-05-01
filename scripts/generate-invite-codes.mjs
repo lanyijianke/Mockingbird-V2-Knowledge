@@ -152,7 +152,7 @@ function resolveMysqlUrl() {
     return url;
 }
 
-function formatSqliteDate(date) {
+function formatMySqlDate(date) {
     return date.toISOString().replace('T', ' ').replace(/\.\d{3}Z$/, '');
 }
 
@@ -242,7 +242,7 @@ async function main() {
     try {
         await ensureInvitationSchema(conn);
 
-        const inviteExpiresAt = formatSqliteDate(new Date(Date.now() + days * 24 * 60 * 60 * 1000));
+        const inviteExpiresAt = formatMySqlDate(new Date(Date.now() + days * 24 * 60 * 60 * 1000));
         const existingCodes = new Set();
         const codes = [];
 

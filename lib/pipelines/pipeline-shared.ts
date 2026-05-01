@@ -22,17 +22,6 @@ export async function ensureDir(dirPath: string): Promise<void> {
     await fs.mkdir(dirPath, { recursive: true });
 }
 
-/**
- * 删除文件（带错误容忍）
- */
-export async function safeDelete(filePath: string): Promise<void> {
-    try {
-        await fs.unlink(filePath);
-    } catch {
-        // 文件可能已不存在
-    }
-}
-
 export interface PipelineReport {
     totalParsed: number;
     newlyAdded: number;
