@@ -9,6 +9,7 @@ const navItems = [
 ];
 
 const infoItems = [
+  { href: '/academy/articles', label: '精读文章', icon: 'bi-book' },
   { href: '/academy/quicknews', label: '信息流', icon: 'bi-star' },
   { href: '/academy/reports', label: '研报', icon: 'bi-file-earmark-bar-graph' },
   { href: '/academy/narratives', label: '热门叙事', icon: 'bi-fire' },
