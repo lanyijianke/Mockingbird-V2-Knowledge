@@ -4,36 +4,38 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState, useEffect } from 'react';
 
-const navItems = [
-  { href: '/academy', label: '学社首页', icon: 'bi-house', exact: true },
+type SidebarItem = { href: string; label: string; icon: string; badge?: string };
+
+const navItems: SidebarItem[] = [
+  { href: '/academy', label: '学社首页', icon: 'bi-house' },
 ];
 
-const infoItems = [
+const infoItems: SidebarItem[] = [
   { href: '/academy/articles', label: '精读文章', icon: 'bi-book' },
   { href: '/academy/quicknews', label: '信息流', icon: 'bi-star' },
   { href: '/academy/reports', label: '研报', icon: 'bi-file-earmark-bar-graph' },
   { href: '/academy/narratives', label: '热门叙事', icon: 'bi-fire' },
 ];
 
-const readItems = [
+const readItems: SidebarItem[] = [
   { href: '/academy', label: '文章', icon: 'bi-file-earmark-text', badge: '86' },
   { href: '/academy', label: '视频', icon: 'bi-play-circle', badge: '24' },
   { href: '/academy', label: '书籍', icon: 'bi-journal-bookmark', badge: '8' },
 ];
 
-const collabItems = [
+const collabItems: SidebarItem[] = [
   { href: '/academy', label: '讨论', icon: 'bi-chat-square-text' },
   { href: '/academy', label: '投票', icon: 'bi-check2-square' },
 ];
 
-const personalItems = [
+const personalItems: SidebarItem[] = [
   { href: '/academy', label: '阅读记录', icon: 'bi-clock-history' },
   { href: '/academy', label: '我的收藏', icon: 'bi-bookmark' },
   { href: '/academy', label: '笔记', icon: 'bi-pencil' },
 ];
 
 
-function SidebarGroup({ label, items, pathname }: { label: string; items: typeof infoItems; pathname: string }) {
+function SidebarGroup({ label, items, pathname }: { label: string; items: SidebarItem[]; pathname: string }) {
   return (
     <div className="sidebar-group">
       <div className="sidebar-group-label">{label}</div>

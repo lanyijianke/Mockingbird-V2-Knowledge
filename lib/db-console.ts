@@ -35,7 +35,6 @@ async function getPool(): Promise<mysql.Pool> {
             waitForConnections: true,
             connectionLimit: 5,
             charset: 'utf8mb4',
-            readOnly: true,
         });
 
         console.log('[DB-Console] 中台数据库已连接');

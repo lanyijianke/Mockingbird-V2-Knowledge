@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 
 interface Article {
   id: number;
@@ -41,6 +41,26 @@ const tagStyle = (tag: string): string => {
   return 'other';
 };
 
+function getDateKey(dt: string): string {
+  if (!dt) return 'unknown';
+  const d = new Date(dt);
+  if (isNaN(d.getTime())) return 'unknown';
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
+function getDateLabel(dateKey: string): string {
+  if (dateKey === 'unknown') return '未知日期';
+  const today = new Date();
+  const todayKey = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+  const yesterday = new Date(today);
+  yesterday.setDate(yesterday.getDate() - 1);
+  const yesterdayKey = `${yesterday.getFullYear()}-${String(yesterday.getMonth() + 1).padStart(2, '0')}-${String(yesterday.getDate()).padStart(2, '0')}`;
+  const shortDate = dateKey.slice(5).replace('-', '.');
+  if (dateKey === todayKey) return `今天 · ${shortDate}`;
+  if (dateKey === yesterdayKey) return `昨天 · ${shortDate}`;
+  return shortDate;
+}
+
 type CategoryTab = 'all' | 'Web3' | 'AI' | 'Finance';
 
 export default function ArticlesPage() {
@@ -57,6 +77,20 @@ export default function ArticlesPage() {
   const limit = 15;
   const sentinelRef = useRef<HTMLDivElement>(null);
   const observerRef = useRef<IntersectionObserver | null>(null);
+
+  const dateGroups = useMemo(() => {
+    const groupMap = new Map<string, Article[]>();
+    for (const article of articles) {
+      const key = getDateKey(article.ingestedAt || article.crawlTime);
+      if (!groupMap.has(key)) groupMap.set(key, []);
+      groupMap.get(key)!.push(article);
+    }
+    const groups: { dateKey: string; label: string; items: Article[] }[] = [];
+    for (const [key, groupItems] of groupMap) {
+      groups.push({ dateKey: key, label: getDateLabel(key), items: groupItems });
+    }
+    return groups;
+  }, [articles]);
 
   const buildUrl = useCallback((off: number) => {
     const params = new URLSearchParams({ limit: String(limit), offset: String(off) });
@@ -173,76 +207,84 @@ export default function ArticlesPage() {
         </div>
       </div>
 
-      {/* Article Cards */}
-      <div className="article-card-list">
-        {articles.map((article, idx) => (
-          <div
-            key={article.id}
-            className="article-card-item"
-            style={{ animationDelay: `${Math.min(idx, 17) * 0.03}s` }}
-          >
-            {/* Header: source, author, time, score */}
-            <div className="article-card-header">
-              <div className="article-card-meta">
-                <span className="article-source-badge">{article.source}</span>
-                {article.author && <span className="article-card-author">{article.author}</span>}
-                <span className="article-card-time">{formatRelativeTime(article.ingestedAt || article.crawlTime)}</span>
-              </div>
-              {article.qualityScore !== null && (
-                <span className={`article-card-score ${(article.qualityScore ?? 0) >= 7 ? 'high' : (article.qualityScore ?? 0) >= 4 ? 'mid' : 'low'}`}>
-                  <i className="bi bi-star" /> {Number(article.qualityScore).toFixed(1)}
-                </span>
-              )}
-            </div>
+      {/* Article Cards grouped by date */}
+      {dateGroups.map(group => (
+        <div key={group.dateKey}>
+          <div className="date-separator">
+            <span className="date-separator-text">{group.label}</span>
+            <div className="date-separator-line" />
+          </div>
+          <div className="article-card-list">
+            {group.items.map((article, idx) => (
+              <div
+                key={article.id}
+                className="article-card-item"
+                style={{ animationDelay: `${Math.min(idx, 17) * 0.03}s` }}
+              >
+                {/* Header: source, author, time, score */}
+                <div className="article-card-header">
+                  <div className="article-card-meta">
+                    <span className="article-source-badge">{article.source}</span>
+                    {article.author && <span className="article-card-author">{article.author}</span>}
+                    <span className="article-card-time">{formatRelativeTime(article.ingestedAt || article.crawlTime)}</span>
+                  </div>
+                  {article.qualityScore !== null && (
+                    <span className={`article-card-score ${(article.qualityScore ?? 0) >= 7 ? 'high' : (article.qualityScore ?? 0) >= 4 ? 'mid' : 'low'}`}>
+                      <i className="bi bi-star" /> {Number(article.qualityScore).toFixed(1)}
+                    </span>
+                  )}
+                </div>
 
-            {/* Title */}
-            <h2 className="article-card-title">{article.title}</h2>
+                {/* Title */}
+                <h2 className="article-card-title">{article.title}</h2>
 
-            {/* AI Reasoning */}
-            {article.aiReasoning && (
-              <div className="article-card-reasoning">
-                <i className="bi bi-lightbulb" /> {article.aiReasoning}
-              </div>
-            )}
-
-            {/* Content Preview */}
-            {article.preview && (
-              <div className="article-card-preview">{article.preview}</div>
-            )}
-
-            {/* Images */}
-            {article.images.length > 0 && (
-              <div className="article-card-images">
-                {article.images.map((img, i) => (
-                  <img key={i} src={img} alt="" className="article-card-img" loading="lazy" />
-                ))}
-              </div>
-            )}
-
-            {/* Footer: tags, links */}
-            <div className="article-card-footer">
-              <div className="article-card-tags">
-                {article.tags.slice(0, 3).map((tag, i) => (
-                  <span key={i} className={`article-card-tag ${tagStyle(tag)}`}>{tag}</span>
-                ))}
-              </div>
-              <div className="article-card-links">
-                {article.url && (
-                  <a href={article.url} target="_blank" rel="noopener noreferrer" className="article-card-ext">
-                    查看原文 <i className="bi bi-box-arrow-up-right" />
-                  </a>
+                {/* AI Reasoning */}
+                {article.aiReasoning && (
+                  <div className="article-card-reasoning">
+                    <i className="bi bi-lightbulb" /> {article.aiReasoning}
+                  </div>
                 )}
-              </div>
-            </div>
-          </div>
-        ))}
 
-        {articles.length === 0 && (
-          <div style={{ padding: '3rem', textAlign: 'center', color: 'rgba(255,255,255,0.2)', fontSize: '0.85rem' }}>
-            暂无精读文章
+                {/* Content Preview */}
+                {article.preview && (
+                  <div className="article-card-preview">{article.preview}</div>
+                )}
+
+                {/* Images */}
+                {article.images.length > 0 && (
+                  <div className="article-card-images">
+                    {article.images.map((img, i) => (
+                      <img key={i} src={img} alt="" className="article-card-img" loading="lazy" />
+                    ))}
+                  </div>
+                )}
+
+                {/* Footer: tags, links */}
+                <div className="article-card-footer">
+                  <div className="article-card-tags">
+                    {article.tags.slice(0, 3).map((tag, i) => (
+                      <span key={i} className={`article-card-tag ${tagStyle(tag)}`}>{tag}</span>
+                    ))}
+                  </div>
+                  <div className="article-card-links">
+                    {article.url && (
+                      <a href={article.url} target="_blank" rel="noopener noreferrer" className="article-card-ext">
+                        查看原文 <i className="bi bi-box-arrow-up-right" />
+                      </a>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
-        )}
-      </div>
+        </div>
+      ))}
+
+      {articles.length === 0 && (
+        <div style={{ padding: '3rem', textAlign: 'center', color: 'rgba(255,255,255,0.2)', fontSize: '0.85rem' }}>
+          暂无精读文章
+        </div>
+      )}
 
       {/* Infinite scroll sentinel */}
       {hasMore && <div ref={sentinelRef} style={{ height: '1px' }} />}

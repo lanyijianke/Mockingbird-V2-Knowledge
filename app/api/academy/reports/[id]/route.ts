@@ -88,7 +88,7 @@ function extractFromTruncatedJson(raw: string): {
     sections?: { title: string; body: string }[];
 } | null {
     // Try to extract executiveSummary
-    const execMatch = raw.match(/"executiveSummary"\s*:\s*"((?:[^"\\]|\\.)*)"/s);
+    const execMatch = raw.match(/"executiveSummary"\s*:\s*"((?:[^"\\]|\\.|[\s\\n])*)"/);
     const executiveSummary = execMatch ? execMatch[1].replace(/\\"/g, '"').replace(/\\n/g, '\n') : undefined;
 
     // Try to extract signalSummary
@@ -98,7 +98,7 @@ function extractFromTruncatedJson(raw: string): {
         const strengthMatch = raw.match(/"objectiveSignalStrength"\s*:\s*(\d+)/);
         const evidenceMatch = raw.match(/"evidenceCount"\s*:\s*(\d+)/);
         const diversityMatch = raw.match(/"sourceDiversity"\s*:\s*(\d+)/);
-        const descMatch = raw.match(/"description"\s*:\s*"((?:[^"\\]|\\.)*)"/s);
+        const descMatch = raw.match(/"description"\s*:\s*"((?:[^"\\]|\\.|[\s\\n])*)"/);
         signalSummary = {
             objectiveSignalStrength: strengthMatch ? Number(strengthMatch[1]) : undefined,
             evidenceCount: evidenceMatch ? Number(evidenceMatch[1]) : undefined,
@@ -109,7 +109,7 @@ function extractFromTruncatedJson(raw: string): {
 
     // Try to extract sections
     let sections: { title: string; body: string }[] | undefined;
-    const sectionTitleMatches = [...raw.matchAll(/"title"\s*:\s*"((?:[^"\\]|\\.)*)"\s*,\s*"body"\s*:\s*"((?:[^"\\]|\\.)*)"/gs)];
+    const sectionTitleMatches = [...raw.matchAll(/"title"\s*:\s*"((?:[^"\\]|\\.|[\s\\n])*)"\s*,\s*"body"\s*:\s*"((?:[^"\\]|\\.|[\s\\n])*)"/g)];
     if (sectionTitleMatches.length > 0) {
         sections = sectionTitleMatches.map(m => ({
             title: m[1].replace(/\\"/g, '"').replace(/\\n/g, '\n'),

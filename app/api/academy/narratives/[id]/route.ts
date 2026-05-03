@@ -127,6 +127,7 @@ export async function GET(
         const relatedItems = await query<{
             ItemId: number; Title: string; Content: string; Source: string;
             Author: string; PublishTime: string; AiSummary: string; AiReasoning: string; QualityScore: number;
+            ExtraData: string;
         }>(
             `SELECT DISTINCT i.Id as ItemId, i.Title, i.Content, i.Source, i.ExtraData,
                     t.AiSummary, t.AiReasoning, t.QualityScore
