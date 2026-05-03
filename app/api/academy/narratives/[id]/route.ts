@@ -45,16 +45,19 @@ export async function GET(
         const insightTypeMap: Record<number, 'risk' | 'opp'> = { 1: 'opp', 2: 'risk', 3: 'risk', 4: 'risk' };
 
         // 3. Inconsistency candidates (contradictions)
-        const contradictions = await query<{
-            Id: number; EntityName: string; StatementA: string; StatementB: string;
-            MismatchKind: number; ReviewStatus: number;
-        }>(
-            `SELECT Id, EntityName, StatementA, StatementB, MismatchKind, ReviewStatus
-             FROM IntelligenceInconsistencyCandidates
-             WHERE NarrativeId = ? AND ReviewStatus IN (0, 1)
-             ORDER BY CreatedAt DESC
-             LIMIT 10`, [narrativeId]
-        );
+        let contradictions: { Id: number; EntityName: string; StatementA: string; StatementB: string; MismatchKind: number; ReviewStatus: number }[] = [];
+        try {
+            contradictions = await query<{
+                Id: number; EntityName: string; StatementA: string; StatementB: string;
+                MismatchKind: number; ReviewStatus: number;
+            }>(
+                `SELECT Id, EntityName, StatementA, StatementB, MismatchKind, ReviewStatus
+                 FROM IntelligenceInconsistencyCandidates
+                 WHERE NarrativeId = ? AND ReviewStatus IN (0, 1)
+                 ORDER BY CreatedAt DESC
+                 LIMIT 10`, [narrativeId]
+            );
+        } catch { /* 表可能不存在 */ }
 
         const mismatchLevel = (m: number) => m <= 2 ? 'high' : m <= 3 ? 'med' : 'low';
 

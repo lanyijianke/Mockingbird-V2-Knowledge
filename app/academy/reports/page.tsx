@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 interface Report {
   id: number;
@@ -10,6 +10,24 @@ interface Report {
   articleCount: number;
   narrativeCount: number;
   createdAt: string;
+}
+
+interface ReportDetail {
+  id: number;
+  title: string;
+  category: string;
+  createdAt: string;
+  articleCount: number;
+  narrativeCount: number;
+  executiveSummary: string;
+  signalSummary: {
+    objectiveSignalStrength?: number;
+    evidenceCount?: number;
+    sourceDiversity?: number;
+    description?: string;
+  } | null;
+  sections: { title: string; body: string }[] | null;
+  trendChanges: { metric: string; previous: string; current: string; direction: string; significance: string }[] | null;
 }
 
 function formatDate(dt: string): string {
@@ -39,6 +57,10 @@ export default function ReportsPage() {
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [activeCategory, setActiveCategory] = useState<string>('all');
 
+  // Detail state
+  const [detail, setDetail] = useState<ReportDetail | null>(null);
+  const [detailLoading, setDetailLoading] = useState(false);
+
   useEffect(() => {
     fetch('/api/academy/reports')
       .then(r => r.json())
@@ -53,6 +75,20 @@ export default function ReportsPage() {
       .catch(err => setError(err.message))
       .finally(() => setLoading(false));
   }, []);
+
+  const loadDetail = useCallback(async (id: number) => {
+    setDetailLoading(true);
+    setDetail(null);
+    try {
+      const res = await fetch(`/api/academy/reports/${id}`).then(r => r.json());
+      if (res.success) setDetail(res.data);
+    } catch { /* ignore */ }
+    setDetailLoading(false);
+  }, []);
+
+  useEffect(() => {
+    if (selectedId) loadDetail(selectedId);
+  }, [selectedId, loadDetail]);
 
   const filteredReports = activeCategory === 'all'
     ? reports
@@ -117,7 +153,11 @@ export default function ReportsPage() {
             <h3>选择一份研报</h3>
             <p>点击左侧列表查看详细分析</p>
           </div>
-        ) : (
+        ) : detailLoading ? (
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'var(--text-muted)' }}>
+            加载研报详情...
+          </div>
+        ) : detail ? (
           <div className="report-view active">
             {/* Action Banner */}
             <div className={`action-banner ${action!.cls}`}>
@@ -126,36 +166,96 @@ export default function ReportsPage() {
                 <span className="signal-label"><i className={`bi ${action!.icon}`} /> {action!.label}</span>
               </div>
               <div className="banner-meta">
-                <span>{formatFullDate(selected.createdAt)}</span>
+                <span>{formatFullDate(detail.createdAt)}</span>
                 <span>·</span>
-                <span>{selected.category.toUpperCase()}</span>
+                <span>{detail.category.toUpperCase()}</span>
               </div>
             </div>
 
             {/* Executive Summary */}
-            <div className="executive-summary">
-              <div className="summary-label">核心判断</div>
-              <div className="summary-text">{selected.summary || '暂无核心判断'}</div>
-            </div>
+            {detail.executiveSummary && (
+              <div className="executive-summary">
+                <div className="summary-label">核心判断</div>
+                <div className="summary-text">{detail.executiveSummary}</div>
+              </div>
+            )}
+
+            {/* Signal Summary */}
+            {detail.signalSummary && (
+              <div className="rpt-section">
+                <div className="rpt-section-title"><i className="bi bi-activity" /> 信号摘要</div>
+                <div className="rpt-signal-grid">
+                  {detail.signalSummary.objectiveSignalStrength != null && (
+                    <div className="rpt-signal-card">
+                      <div className="rpt-signal-value">{detail.signalSummary.objectiveSignalStrength}</div>
+                      <div className="rpt-signal-label">信号强度</div>
+                    </div>
+                  )}
+                  {detail.signalSummary.evidenceCount != null && (
+                    <div className="rpt-signal-card">
+                      <div className="rpt-signal-value">{detail.signalSummary.evidenceCount}</div>
+                      <div className="rpt-signal-label">证据数</div>
+                    </div>
+                  )}
+                  {detail.signalSummary.sourceDiversity != null && (
+                    <div className="rpt-signal-card">
+                      <div className="rpt-signal-value">{detail.signalSummary.sourceDiversity}</div>
+                      <div className="rpt-signal-label">信源多样性</div>
+                    </div>
+                  )}
+                </div>
+                {detail.signalSummary.description && (
+                  <div className="rpt-signal-desc">{detail.signalSummary.description}</div>
+                )}
+              </div>
+            )}
 
             {/* Metrics */}
             <div className="metrics-bar">
               <div className="metric-item">
-                <span className="metric-value">{selected.articleCount}</span>
+                <span className="metric-value">{detail.articleCount}</span>
                 <span className="metric-label">情报来源</span>
               </div>
               <div className="metric-item">
-                <span className="metric-value">{selected.narrativeCount}</span>
+                <span className="metric-value">{detail.narrativeCount}</span>
                 <span className="metric-label">关联叙事</span>
               </div>
             </div>
 
-            {/* Footer */}
-            <div className="report-detail-footer">
-              <a href="#"><i className="bi bi-box-arrow-up-right" /> 对象详情页</a>
-            </div>
+            {/* Trend Changes */}
+            {detail.trendChanges && detail.trendChanges.length > 0 && (
+              <div className="rpt-section">
+                <div className="rpt-section-title"><i className="bi bi-graph-up-arrow" /> 趋势变化</div>
+                <div className="rpt-trend-list">
+                  {detail.trendChanges.map((tc, i) => (
+                    <div key={i} className="rpt-trend-item">
+                      <div className="rpt-trend-metric">{tc.metric}</div>
+                      <div className="rpt-trend-values">
+                        <span className="rpt-trend-prev">{tc.previous}</span>
+                        <i className={`bi bi-arrow-right rpt-trend-arrow ${tc.direction === 'up' ? 'up' : tc.direction === 'down' ? 'down' : ''}`} />
+                        <span className={`rpt-trend-cur ${tc.direction === 'up' ? 'up' : tc.direction === 'down' ? 'down' : ''}`}>{tc.current}</span>
+                      </div>
+                      {tc.significance && <div className="rpt-trend-sig">{tc.significance}</div>}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Sections (三阶推导核心内容) */}
+            {detail.sections && detail.sections.length > 0 && (
+              <div className="rpt-section">
+                <div className="rpt-section-title"><i className="bi bi-book" /> 深度分析</div>
+                {detail.sections.map((sec, i) => (
+                  <div key={i} className="rpt-subsection">
+                    <h4 className="rpt-subsection-title">{sec.title}</h4>
+                    <div className="rpt-subsection-body">{sec.body}</div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
-        )}
+        ) : null}
       </div>
     </div>
   );

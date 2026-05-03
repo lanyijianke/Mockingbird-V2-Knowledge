@@ -13,7 +13,11 @@ function serializeRow(row: Record<string, unknown>): Record<string, unknown> {
         if (row[key] instanceof Date) {
             const d = row[key] as Date;
             const pad = (n: number) => String(n).padStart(2, '0');
-            row[key] = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+            // mysql2 dateframe=true 时返回本地时间 Date，
+            // 用 toISOString 拿 UTC 然后统一 +8 转北京时间
+            const utcMs = d.getTime() - d.getTimezoneOffset() * 60 * 1000;
+            const bj = new Date(utcMs + 8 * 60 * 60 * 1000);
+            row[key] = `${bj.getUTCFullYear()}-${pad(bj.getUTCMonth() + 1)}-${pad(bj.getUTCDate())} ${pad(bj.getUTCHours())}:${pad(bj.getUTCMinutes())}:${pad(bj.getUTCSeconds())}`;
         }
     }
     return row;

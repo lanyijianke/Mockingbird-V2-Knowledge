@@ -11,6 +11,10 @@ interface FeedItem {
   crawlTime: string;
   ingestedAt: string;
   contentType: string;
+  aiReasoning: string;
+  tags: string[];
+  url: string;
+  images: string[];
   category?: string;
 }
 
@@ -19,6 +23,14 @@ function inferCategory(title: string): string | null {
   if (/ai|模型|llm|gpt|claude|gemini|openai|deepmind|llama|大模型|豆包|文心|端侧|mistral|pixtral|nvidia/.test(t)) return 'ai';
   if (/比特币|以太坊|defi|web3|solana|etf|crypto|uniswap|vitalik|币|链|token|nft|区块链|circle|hooks|pectra/.test(t)) return 'web3';
   if (/美联储|降息|pmi|股市|日元|黄金|港股|a股|英伟达|财报|加息|通胀|利率|宏观|中芯|算力|美联储|fomc/.test(t)) return 'finance';
+  return null;
+}
+
+function categoryFromTags(tags: string[]): string | null {
+  const upper = tags.map(t => t.toUpperCase());
+  if (upper.includes('WEB3') || upper.includes('CRYPTO') || upper.includes('DEFI') || upper.includes('BLOCKCHAIN')) return 'web3';
+  if (upper.includes('AI') || upper.includes('LLM') || upper.includes('GPT')) return 'ai';
+  if (upper.includes('FINANCE') || upper.includes('MACRO') || upper.includes('FED')) return 'finance';
   return null;
 }
 
@@ -71,7 +83,7 @@ export default function QuickNewsPage() {
         if (res.success) {
           const enriched = res.data.map((item: FeedItem) => ({
             ...item,
-            category: inferCategory(item.title) || undefined,
+            category: categoryFromTags(item.tags || []) || inferCategory(item.title) || undefined,
           }));
           setItems(enriched);
         } else {
@@ -102,7 +114,8 @@ export default function QuickNewsPage() {
       const q = searchQuery.toLowerCase().trim();
       result = result.filter(item =>
         item.title.toLowerCase().includes(q) ||
-        (item.summary || '').toLowerCase().includes(q)
+        (item.summary || '').toLowerCase().includes(q) ||
+        (item.tags || []).some(t => t.toLowerCase().includes(q))
       );
     }
 
@@ -225,18 +238,57 @@ export default function QuickNewsPage() {
                         {item.summary}
                       </div>
                     )}
-                    {isExpanded && item.summary && (
+                    {isExpanded && (
                       <div className="feed-detail">
                         <div className="feed-detail-text">{item.summary}</div>
+
+                        {/* Images */}
+                        {item.images && item.images.length > 0 && (
+                          <div className="feed-images">
+                            {item.images.map((img, i) => (
+                              <img key={i} src={img} alt="" className="feed-img" loading="lazy" />
+                            ))}
+                          </div>
+                        )}
+
+                        {/* AI Reasoning (评价) */}
+                        {item.aiReasoning && (
+                          <div className="feed-ai-reasoning">
+                            <i className="bi bi-lightbulb" /> {item.aiReasoning}
+                          </div>
+                        )}
+
                         <div className="feed-detail-actions">
                           <span><i className="bi bi-clock" /> {time}</span>
-                          <span><i className="bi bi-arrow-repeat" /> {item.source}</span>
+                          <span className="feed-source-tag"><i className="bi bi-arrow-repeat" /> {item.source}</span>
+                          {item.tags && item.tags.length > 0 && (
+                            <span className="feed-tags">
+                              {item.tags.slice(0, 4).map((t, i) => (
+                                <span key={i} className="feed-tag-chip">{t}</span>
+                              ))}
+                            </span>
+                          )}
+                          {item.url && (
+                            <a
+                              className="feed-ext-link"
+                              href={item.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              onClick={e => e.stopPropagation()}
+                            >
+                              查看原文 <i className="bi bi-box-arrow-up-right" />
+                            </a>
+                          )}
                         </div>
                       </div>
                     )}
-                    {item.qualityScore !== null && (
-                      <span className="feed-score"><i className="bi bi-star" /> {Number(item.qualityScore).toFixed(1)}</span>
-                    )}
+                    <div className="feed-score-row">
+                      {item.qualityScore !== null && (
+                        <span className={`feed-score ${(item.qualityScore ?? 0) >= 7 ? 'high' : (item.qualityScore ?? 0) >= 4 ? 'mid' : 'low'}`}>
+                          <i className="bi bi-star" /> {Number(item.qualityScore).toFixed(1)}
+                        </span>
+                      )}
+                    </div>
                   </div>
                   <i className="bi bi-chevron-right feed-expand" />
                 </div>
