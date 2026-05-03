@@ -70,6 +70,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               </div>
             </div>
 
+            <Link href="/academy/narratives" className="nav-link academy-link">学社</Link>
+
             <NavAuthButton />
           </div>
         </nav>
