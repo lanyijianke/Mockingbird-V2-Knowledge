@@ -1,8 +1,11 @@
 'use client';
 
+import '@/app/_styles/membership.css';
+import '@/app/_styles/auth.css';
 import { useState, useEffect, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { useAuthModal } from '@/app/AuthModalContext';
 
 
 interface UserInfo {
@@ -15,6 +18,7 @@ interface UserInfo {
 
 export default function MembershipPage() {
   const router = useRouter();
+  const { openAuth } = useAuthModal();
   const [, setUser] = useState<UserInfo | null>(null);
   const [loading, setLoading] = useState(true);
   const [code, setCode] = useState('');
@@ -32,12 +36,12 @@ export default function MembershipPage() {
         const data = await res.json();
         const nextUser: UserInfo | null = data.user ?? null;
         if (!nextUser) {
-          router.push('/login?callbackUrl=/membership');
+          openAuth({ mode: 'login', callbackUrl: '/membership' });
           return;
         }
         setUser(nextUser);
       } catch {
-        router.push('/login?callbackUrl=/membership');
+        openAuth({ mode: 'login', callbackUrl: '/membership' });
       } finally {
         setLoading(false);
       }

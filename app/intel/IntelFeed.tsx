@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import Link from 'next/link';
+import { useAuthModal } from '@/app/AuthModalContext';
 
 /* ── Types ── */
 
@@ -66,7 +66,7 @@ export default function IntelFeed() {
     const [error, setError] = useState<string | null>(null);
     const [user, setUser] = useState<UserInfo | null>(null);
     const [expandedId, setExpandedId] = useState<number | null>(null);
-    const [showLoginModal, setShowLoginModal] = useState(false);
+    const { openAuth } = useAuthModal();
 
     useEffect(() => {
         Promise.all([
@@ -101,11 +101,11 @@ export default function IntelFeed() {
 
     const handleCardClick = useCallback((item: FeedItem) => {
         if (!user) {
-            setShowLoginModal(true);
+            openAuth({ mode: 'login' });
             return;
         }
         setExpandedId(prev => prev === item.id ? null : item.id);
-    }, [user]);
+    }, [user, openAuth]);
 
     if (loading) {
         return <div className="intel-loading">正在加载情报...</div>;
@@ -144,20 +144,6 @@ export default function IntelFeed() {
 
             {filtered.length === 0 && (
                 <div className="intel-empty">暂无情报数据</div>
-            )}
-
-            {/* Login Modal */}
-            {showLoginModal && (
-                <div className="intel-login-overlay" onClick={() => setShowLoginModal(false)}>
-                    <div className="intel-login-modal" onClick={e => e.stopPropagation()}>
-                        <h3>登录查看详情</h3>
-                        <p>注册后可查看完整的情报分析、事件链和关联信号。</p>
-                        <div className="intel-login-actions">
-                            <Link href="/login" className="intel-login-btn intel-login-btn--primary">登录</Link>
-                            <Link href="/register" className="intel-login-btn intel-login-btn--secondary">注册</Link>
-                        </div>
-                    </div>
-                </div>
             )}
         </>
     );

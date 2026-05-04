@@ -1,9 +1,10 @@
 import { ToastProvider } from '@/app/ToastContext';
+import { AuthModalProvider } from '@/app/AuthModalContext';
 import SiteNav from './SiteNav';
-import { buildAbsoluteUrl, getSiteSeoConfig } from '@/lib/seo/config';
 import { buildRootMetadata } from '@/lib/seo/metadata';
 import { buildWebSiteJsonLd, JsonLdScript } from '@/lib/seo/schema';
 import './globals.css';
+import '@/app/_styles/nav.css';
 
 // ════════════════════════════════════════════════════════════════
 // 全局元数据 — Next.js Metadata API
@@ -12,9 +13,6 @@ import './globals.css';
 
 export const runtime = 'nodejs';
 export const metadata = buildRootMetadata();
-const SITE_HOST = new URL(buildAbsoluteUrl('/')).host;
-const SITE_CONFIG = getSiteSeoConfig();
-const CURRENT_YEAR = new Date().getFullYear();
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -24,6 +22,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body>
         <ToastProvider>
+        <AuthModalProvider>
         {/* ═══ Top Navigation ═══ */}
         <SiteNav />
 
@@ -34,21 +33,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           </div>
         </main>
 
-        {/* ═══ Footer ═══ */}
-        <footer className="site-footer">
-          <div>© {CURRENT_YEAR} {SITE_CONFIG.siteName} · {SITE_CONFIG.alternateName} · {SITE_HOST}</div>
-          <a
-            href={SITE_CONFIG.icpUrl}
-            target="_blank"
-            rel="noopener noreferrer nofollow"
-            className="site-footer-icp"
-          >
-            {SITE_CONFIG.icpNumber}
-          </a>
-        </footer>
-
         {/* ═══ WebSite JSON-LD (全局结构化数据) ═══ */}
         <JsonLdScript data={buildWebSiteJsonLd()} />
+        </AuthModalProvider>
         </ToastProvider>
       </body>
     </html>

@@ -4,6 +4,7 @@ import './academy.css';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState, useEffect } from 'react';
+import { useAuthModal } from '@/app/AuthModalContext';
 
 type SidebarItem = { href: string; label: string; icon: string; badge?: string };
 
@@ -62,6 +63,7 @@ const roleLabels: Record<string, { icon: string; label: string }> = {
 
 export default function AcademyLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const { openAuth } = useAuthModal();
   const [user, setUser] = useState<{ name: string; role: string; membershipExpiresAt: string | null } | null>(null);
   const [loaded, setLoaded] = useState(false);
 
@@ -91,9 +93,13 @@ export default function AcademyLayout({ children }: { children: React.ReactNode 
               <div className="sidebar-member-tier"><i className={`bi ${roleInfo.icon}`} /> {roleInfo.label}</div>
             )}
             {!user && loaded && (
-              <Link href="/login" className="sidebar-member-tier" style={{ textDecoration: 'none' }}>
+              <button
+                className="sidebar-member-tier"
+                style={{ textDecoration: 'none', background: 'none', border: 'none', cursor: 'pointer', font: 'inherit', color: 'inherit' }}
+                onClick={() => openAuth({ mode: 'login' })}
+              >
                 <i className="bi bi-box-arrow-in-right" /> 登录 / 注册
-              </Link>
+              </button>
             )}
             {user?.membershipExpiresAt && (
               <div className="sidebar-member-expiry">

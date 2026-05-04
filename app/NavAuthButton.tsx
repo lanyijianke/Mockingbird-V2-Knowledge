@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { isExpiredMembership } from '@/lib/auth/roles';
 import { useToast } from '@/app/ToastContext';
+import { useAuthModal } from '@/app/AuthModalContext';
 
 
 interface UserInfo {
@@ -25,6 +26,7 @@ export default function NavAuthButton() {
   const [loggingOut, setLoggingOut] = useState(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
   const { showToast } = useToast();
+  const { openAuth } = useAuthModal();
 
   useEffect(() => {
     async function fetchUser() {
@@ -82,16 +84,12 @@ export default function NavAuthButton() {
   // Not logged in
   if (!user) {
     return (
-      <a
-        href="/login"
+      <button
         className="nav-auth-login"
-        onClick={(e) => {
-          e.preventDefault();
-          showToast('功能建设中，敬请期待 🛠');
-        }}
+        onClick={() => openAuth({ mode: 'login' })}
       >
         登录
-      </a>
+      </button>
     );
   }
 

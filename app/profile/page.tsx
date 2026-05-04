@@ -1,8 +1,10 @@
 'use client';
 
+import '@/app/_styles/profile.css';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { useAuthModal } from '@/app/AuthModalContext';
 import { getSiteBrandConfig } from '@/lib/site-config';
 import {
   getMembershipExpiryTimestamp,
@@ -36,6 +38,7 @@ const ROLE_LABELS: Record<string, { label: string; className: string }> = {
 
 export default function ProfilePage() {
   const router = useRouter();
+  const { openAuth } = useAuthModal();
   const [user, setUser] = useState<UserInfo | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -49,12 +52,12 @@ export default function ProfilePage() {
         const data = await res.json();
         const nextUser: UserInfo | null = data.user ?? null;
         if (!nextUser) {
-          router.push('/login?callbackUrl=/profile');
+          openAuth({ mode: 'login', callbackUrl: '/profile' });
           return;
         }
         setUser(nextUser);
       } catch {
-        router.push('/login?callbackUrl=/profile');
+        openAuth({ mode: 'login', callbackUrl: '/profile' });
       } finally {
         setLoading(false);
       }

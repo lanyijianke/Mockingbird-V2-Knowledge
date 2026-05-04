@@ -1,0 +1,511 @@
+/* ═══════ Rankings — Shared ═══════ */
+.ranking-tabs {
+  display: flex;
+  gap: 0.25rem;
+  margin-bottom: 2.5rem;
+  border-bottom: 1px solid var(--glass-border);
+  overflow-x: auto;
+}
+
+.ranking-tab {
+  padding: 0.8rem 1.2rem;
+  color: var(--text-muted);
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: all 0.2s;
+  border-bottom: 2px solid transparent;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  white-space: nowrap;
+}
+
+.ranking-tab:hover {
+  color: var(--text-main);
+  border-bottom-color: var(--glass-border);
+}
+
+.zone-header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.zone-title {
+  font-family: var(--font-serif);
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0 0 0.8rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+}
+
+.zone-subtitle {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+.rank-badge {
+  position: absolute;
+  top: 50%;
+  left: 1rem;
+  transform: translateY(-50%);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--glass-border);
+  color: var(--text-muted);
+  padding: 0.2rem 0.6rem;
+  border-radius: 2rem;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 0.8rem;
+}
+
+.rank-top {
+  color: #000;
+}
+
+.card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 0.8rem;
+  border-top: 1px solid var(--glass-border);
+}
+
+.btn-visit {
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 5rem 0;
+  color: var(--text-muted);
+}
+
+.empty-state i {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  display: block;
+}
+
+/* ═══════ GitHub Trending — Blue Theme ═══════ */
+.zone-title-gh {
+  color: #58a6ff;
+}
+
+.trending-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.trending-card {
+  position: relative;
+  padding: 1.5rem 1.5rem 1.5rem 4.5rem;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  transition: all 0.3s ease;
+}
+
+.trending-card:hover {
+  transform: translateX(4px);
+  border-color: rgba(88, 166, 255, 0.2);
+}
+
+.rank-gh {
+  background: #58a6ff;
+  box-shadow: 0 0 12px rgba(88, 166, 255, 0.4);
+}
+
+.repo-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.repo-name {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #58a6ff;
+  margin: 0;
+  font-family: var(--font-mono);
+}
+
+.repo-icon {
+  color: var(--text-muted);
+  margin-right: 0.3rem;
+  font-size: 0.9rem;
+}
+
+.lang-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--glass-border);
+  padding: 0.15rem 0.6rem;
+  border-radius: 2rem;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+}
+
+.lang-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.repo-desc {
+  color: var(--text-muted);
+  font-size: 0.88rem;
+  line-height: 1.6;
+  margin: 0 0 0.8rem;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.repo-stats {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.stat-item {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  font-family: var(--font-mono);
+}
+
+.stat-item i {
+  font-size: 0.75rem;
+}
+
+.stat-today {
+  color: #f0883e;
+  font-weight: 700;
+}
+
+.btn-visit-gh:hover {
+  color: #58a6ff;
+}
+
+/* ═══════ ProductHunt — Red/Orange Theme ═══════ */
+.zone-title-ph {
+  color: #ff6154;
+}
+
+.ph-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+  gap: 1.5rem;
+}
+
+.ph-card {
+  position: relative;
+  padding: 2rem 1.5rem 1.5rem;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  transition: all 0.3s ease;
+}
+
+.ph-card:hover {
+  transform: translateY(-6px);
+  border-color: rgba(255, 97, 84, 0.2);
+}
+
+.ph-card .rank-badge {
+  top: -0.6rem;
+  left: 1.2rem;
+  transform: none;
+}
+
+.rank-ph {
+  background: #ff6154;
+  color: #fff;
+  box-shadow: 0 0 12px rgba(255, 97, 84, 0.4);
+}
+
+.ph-header {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+  margin-bottom: 1.2rem;
+}
+
+.ph-thumb {
+  width: 52px;
+  height: 52px;
+  border-radius: 10px;
+  object-fit: cover;
+  flex-shrink: 0;
+  border: 1px solid var(--glass-border);
+}
+
+.ph-thumb-placeholder {
+  width: 52px;
+  height: 52px;
+  border-radius: 10px;
+  background: rgba(255, 97, 84, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ff6154;
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+
+.ph-title-group {
+  flex: 1;
+  min-width: 0;
+}
+
+.product-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin: 0 0 0.3rem;
+  color: var(--text-main);
+}
+
+.ph-tagline {
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  line-height: 1.5;
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.ph-votes {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: #ff6154;
+}
+
+.score-value {
+  font-weight: 800;
+  font-size: 1.05rem;
+}
+
+.score-label {
+  font-size: 0.65rem;
+  font-weight: 900;
+  opacity: 0.6;
+  letter-spacing: 0.1em;
+}
+
+.btn-visit-ph:hover {
+  color: #ff6154;
+}
+
+/* ═══════ Skills.sh Trending — Orange Theme ═══════ */
+.zone-title-skills {
+  color: #f0883e;
+}
+
+.skills-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.skills-card {
+  position: relative;
+  padding: 1.2rem 1.5rem 1.2rem 4.2rem;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md);
+  transition: all 0.25s ease;
+}
+
+.skills-card:hover {
+  border-color: rgba(240, 136, 62, 0.2);
+}
+
+.rank-skills {
+  background: #f0883e;
+  box-shadow: 0 0 12px rgba(240, 136, 62, 0.4);
+}
+
+.skills-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.3rem;
+}
+
+.skills-name {
+  font-size: 0.95rem;
+  font-weight: 700;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.skills-name i {
+  color: #f0883e;
+}
+
+.skills-name a {
+  color: var(--text-main);
+  text-decoration: none;
+}
+
+.skills-name a:hover {
+  color: #f0883e;
+}
+
+.install-count {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: #f0883e;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.skills-repo {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.skills-repo a {
+  color: var(--text-muted);
+  text-decoration: none;
+  font-family: var(--font-mono);
+}
+
+.skills-repo a:hover {
+  color: var(--text-main);
+}
+
+.skills-description {
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  line-height: 1.6;
+  margin: 0.4rem 0 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  opacity: 0.8;
+}
+
+/* ═══════ Skills.sh Hot — Purple Theme ═══════ */
+.zone-title-hot {
+  color: #e040fb;
+}
+
+.skills-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1.2rem;
+}
+
+.skills-hot-card {
+  position: relative;
+  padding: 2rem 1.5rem 1.5rem;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  transition: all 0.3s ease;
+}
+
+.skills-hot-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(224, 64, 251, 0.2);
+}
+
+.skills-hot-card .rank-badge {
+  top: -0.6rem;
+  left: 1.2rem;
+  transform: none;
+}
+
+.rank-hot {
+  background: #e040fb;
+  box-shadow: 0 0 12px rgba(224, 64, 251, 0.4);
+}
+
+.skills-hot-name {
+  font-size: 1rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem;
+}
+
+.skills-hot-name a {
+  color: var(--text-main);
+  text-decoration: none;
+}
+
+.skills-hot-name a:hover {
+  color: #e040fb;
+}
+
+.skills-hot-installs {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: #e040fb;
+  margin-top: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+/* ═══════ Rankings responsive ═══════ */
+@media (max-width: 768px) {
+  .trending-card {
+    padding-left: 1.5rem;
+    padding-top: 2.5rem;
+  }
+
+  .trending-card .rank-badge {
+    top: 0.8rem;
+    left: 1rem;
+    transform: none;
+  }
+
+  .ph-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .skills-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .skills-card {
+    padding-left: 1.5rem;
+    padding-top: 2.2rem;
+  }
+
+  .skills-card .rank-badge {
+    top: 0.6rem;
+    left: 1rem;
+    transform: none;
+  }
+}

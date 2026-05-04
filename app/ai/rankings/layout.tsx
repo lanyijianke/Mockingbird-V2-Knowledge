@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import '@/app/_styles/rankings.css';
 import { buildRankingsLayoutMetadata } from '@/lib/seo/metadata';
 
 export const metadata = buildRankingsLayoutMetadata();
