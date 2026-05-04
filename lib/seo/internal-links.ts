@@ -96,25 +96,25 @@ export function buildPromptInternalLinkGroup(
         links: [
             {
                 id: 'prompt-list',
-                href: '/prompts',
+                href: '/ai/prompts',
                 label: '全部提示词',
                 description: '浏览全部提示词，按模型与场景继续筛选。',
             },
             {
                 id: 'prompt-category',
-                href: `/prompts/categories/${input.categorySlug}`,
+                href: `/ai/prompts/categories/${input.categorySlug}`,
                 label: `${input.categoryLabel} 提示词`,
                 description: `进入 ${input.categoryLabel} 分类页，查看同类提示词合集。`,
             },
             {
                 id: 'prompt-scenarios',
-                href: '/prompts/scenarios',
+                href: '/ai/prompts/scenarios',
                 label: '提示词场景库',
                 description: '进入场景化提示词入口，按任务浏览提示词组合。',
             },
             {
                 id: 'prompt-detail',
-                href: `/prompts/${input.promptId}`,
+                href: `/ai/prompts/${input.promptId}`,
                 label: input.promptTitle,
                 description: '回到当前提示词详情页。',
             },
@@ -129,25 +129,25 @@ export function buildRankingInternalLinkGroup(): RankingInternalLinkGroup {
         links: [
             {
                 id: 'ranking-github',
-                href: '/rankings/github',
+                href: '/ai/rankings/github',
                 label: 'GitHub Trending',
                 description: '查看开源项目热度变化。',
             },
             {
                 id: 'ranking-producthunt',
-                href: '/rankings/producthunt',
+                href: '/ai/rankings/producthunt',
                 label: 'ProductHunt',
                 description: '查看新产品发布热度。',
             },
             {
                 id: 'ranking-skills-trending',
-                href: '/rankings/skills-trending',
+                href: '/ai/rankings/skills-trending',
                 label: 'Skills Trending',
                 description: '查看技能与工具的趋势热度。',
             },
             {
                 id: 'ranking-skills-hot',
-                href: '/rankings/skills-hot',
+                href: '/ai/rankings/skills-hot',
                 label: 'Skills Hot',
                 description: '查看技能与工具的短期爆发热度。',
             },

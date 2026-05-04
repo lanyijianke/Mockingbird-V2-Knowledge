@@ -113,7 +113,7 @@ export default function PromptInfiniteGallery({
                 {items.map((prompt, idx) => (
                     <PromptGalleryCard
                         key={prompt.id}
-                        href={`/prompts/${prompt.id}`}
+                        href={`/ai/prompts/${prompt.id}`}
                         title={prompt.title}
                         categoryName={getCategoryName(prompt.category)}
                         copyCount={prompt.copyCount}

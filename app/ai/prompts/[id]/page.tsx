@@ -76,7 +76,7 @@ export default async function PromptDetailPage({
     });
     const rankingLinks = buildRankingInternalLinkGroup();
     const promptDescription = prompt.description || prompt.content.slice(0, 160);
-    const promptListCategoryHref = `/prompts?category=${encodeURIComponent(prompt.category)}`;
+    const promptListCategoryHref = `/ai/prompts?category=${encodeURIComponent(prompt.category)}`;
     const explorationLinks = [
         {
             href: promptListCategoryHref,
@@ -104,7 +104,7 @@ export default async function PromptDetailPage({
                     title: prompt.title,
                     description: promptDescription,
                     content: prompt.content,
-                    url: `${SITE_URL}/prompts/${id}`,
+                    url: `${SITE_URL}/ai/prompts/${id}`,
                     coverImageUrl: prompt.coverImageUrl,
                     category: getCategoryName(prompt.category),
                     createdAt: prompt.createdAt,
@@ -112,8 +112,8 @@ export default async function PromptDetailPage({
                 }),
                 buildBreadcrumbJsonLd([
                     { name: '首页', url: SITE_URL },
-                    { name: '提示词', url: `${SITE_URL}/prompts` },
-                    { name: prompt.title, url: `${SITE_URL}/prompts/${id}` },
+                    { name: '提示词', url: `${SITE_URL}/ai/prompts` },
+                    { name: prompt.title, url: `${SITE_URL}/ai/prompts/${id}` },
                 ]),
             ]} />
 

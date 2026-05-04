@@ -19,7 +19,7 @@ const VALID_PROMPT_CATEGORIES = new Set(
 );
 
 function getPromptCategoryPath(category: string): string {
-    return `/prompts/categories/${category}`;
+    return `/ai/prompts/categories/${category}`;
 }
 
 export async function generateMetadata({
@@ -72,7 +72,7 @@ export default async function PromptCategoryLandingPage({
             <JsonLdScript data={[
                 buildBreadcrumbJsonLd([
                     { name: '首页', url: buildAbsoluteUrl('/') },
-                    { name: '提示词库', url: buildAbsoluteUrl('/prompts') },
+                    { name: '提示词库', url: buildAbsoluteUrl('/ai/prompts') },
                     { name: `${categoryName} 提示词`, url: pageUrl },
                 ]),
                 buildCollectionPageJsonLd(
@@ -86,7 +86,7 @@ export default async function PromptCategoryLandingPage({
                     pageUrl,
                     result.items.map((item) => ({
                         name: item.title,
-                        url: buildAbsoluteUrl(`/prompts/${item.id}`),
+                        url: buildAbsoluteUrl(`/ai/prompts/${item.id}`),
                     })),
                 ),
             ]} />
@@ -106,7 +106,7 @@ export default async function PromptCategoryLandingPage({
             <section className="home-section">
                 <div className="section-bar">
                     <h2 className="section-title">专题内提示词</h2>
-                    <Link href={`/prompts?category=${category}`} className="section-more">
+                    <Link href={`/ai/prompts?category=${category}`} className="section-more">
                         在列表页按此分类查看 →
                     </Link>
                 </div>
@@ -120,7 +120,7 @@ export default async function PromptCategoryLandingPage({
                     {result.items.map((prompt) => (
                         <Link
                             key={prompt.id}
-                            href={`/prompts/${prompt.id}`}
+                            href={`/ai/prompts/${prompt.id}`}
                             className="glass glass-card"
                             style={{ padding: '1.25rem', textDecoration: 'none', color: 'inherit' }}
                         >

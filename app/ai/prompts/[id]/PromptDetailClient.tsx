@@ -84,7 +84,7 @@ export default function PromptDetailClient({
     return (
         <div className="pd-container">
             {/* 浮动返回按钮 */}
-            <Link href="/prompts" className="pd-back-float">
+            <Link href="/ai/prompts" className="pd-back-float">
                 <i className="bi bi-arrow-left" />
             </Link>
 
@@ -206,7 +206,7 @@ export default function PromptDetailClient({
                     </div>
                     <div className="pd-related-grid">
                         {relatedPrompts.map(p => (
-                            <Link key={p.id} href={`/prompts/${p.id}`} className="pd-related-card">
+                            <Link key={p.id} href={`/ai/prompts/${p.id}`} className="pd-related-card">
                                 <div className="pd-related-card-cover">
                                     {p.coverImageUrl ? (
                                         <Image

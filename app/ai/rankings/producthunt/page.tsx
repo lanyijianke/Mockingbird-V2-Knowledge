@@ -9,19 +9,19 @@ import { buildCollectionPageJsonLd, buildItemListJsonLd, JsonLdScript } from '@/
 export const metadata: Metadata = buildRankingMetadata({
     title: 'ProductHunt 每日热榜 — 排行榜',
     description: '聚合 ProductHunt 全球最热门的新产品与工具，每 2 小时自动更新。',
-    canonicalPath: '/rankings/producthunt',
+    canonicalPath: '/ai/rankings/producthunt',
 });
 
 export const revalidate = 600;
-const PAGE_URL = buildAbsoluteUrl('/rankings/producthunt');
+const PAGE_URL = buildAbsoluteUrl('/ai/rankings/producthunt');
 const INTERNAL_LINKS = [
     {
-        href: '/rankings/github',
+        href: '/ai/rankings/github',
         title: '查看 GitHub Trending',
         description: '把新产品热度和开源项目趋势放在一起，对比产品化与开发者生态的变化。',
     },
     {
-        href: '/prompts/categories/gemini-3',
+        href: '/ai/prompts/categories/gemini-3',
         title: 'Gemini 3 提示词分类',
         description: '从热榜产品延伸到具体可复用的提示词模板，更快进入实操阶段。',
     },

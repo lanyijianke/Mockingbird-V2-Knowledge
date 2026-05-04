@@ -99,8 +99,8 @@ export default async function RankingTopicPage({ params }: TopicPageParams) {
                 data={[
                     buildBreadcrumbJsonLd([
                         { name: '首页', url: buildAbsoluteUrl('/') },
-                        { name: '排行榜', url: buildAbsoluteUrl('/rankings/github') },
-                        { name: '热榜专题', url: buildAbsoluteUrl('/rankings/topics') },
+                        { name: '排行榜', url: buildAbsoluteUrl('/ai/rankings/github') },
+                        { name: '热榜专题', url: buildAbsoluteUrl('/ai/rankings/topics') },
                         { name: page.title, url: pageUrl },
                     ]),
                     buildCollectionPageJsonLd(page.title, page.description, pageUrl),

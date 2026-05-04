@@ -5,7 +5,7 @@ import { buildPromptsListMetadata } from '@/lib/seo/metadata';
 import { getPromptScenarioPages } from '@/lib/seo/growth-pages';
 import { buildCollectionPageJsonLd, JsonLdScript } from '@/lib/seo/schema';
 
-const SCENARIO_INDEX_PATH = '/prompts/scenarios';
+const SCENARIO_INDEX_PATH = '/ai/prompts/scenarios';
 
 export const metadata: Metadata = buildPromptsListMetadata({
     title: '提示词场景库',

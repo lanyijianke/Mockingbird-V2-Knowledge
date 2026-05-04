@@ -76,8 +76,8 @@ export default async function PromptScenarioPage({ params }: ScenarioPageParams)
                 data={[
                     buildBreadcrumbJsonLd([
                         { name: '首页', url: buildAbsoluteUrl('/') },
-                        { name: '提示词库', url: buildAbsoluteUrl('/prompts') },
-                        { name: '提示词场景页', url: buildAbsoluteUrl('/prompts/scenarios') },
+                        { name: '提示词库', url: buildAbsoluteUrl('/ai/prompts') },
+                        { name: '提示词场景页', url: buildAbsoluteUrl('/ai/prompts/scenarios') },
                         { name: scenario.title, url: pageUrl },
                     ]),
                     buildCollectionPageJsonLd(
@@ -91,7 +91,7 @@ export default async function PromptScenarioPage({ params }: ScenarioPageParams)
                         pageUrl,
                         selectedPrompts.items.map((prompt) => ({
                             name: prompt.title,
-                            url: buildAbsoluteUrl(`/prompts/${prompt.id}`),
+                            url: buildAbsoluteUrl(`/ai/prompts/${prompt.id}`),
                         })),
                     ),
                     ...(faqItems.length > 0 ? [buildFaqPageJsonLd(faqItems)] : []),
@@ -189,7 +189,7 @@ export default async function PromptScenarioPage({ params }: ScenarioPageParams)
             <section className="home-section">
                 <div className="section-bar">
                     <h2 className="section-title">精选提示词</h2>
-                    <Link href="/prompts" className="section-more">
+                    <Link href="/ai/prompts" className="section-more">
                         回到提示词库 →
                     </Link>
                 </div>
@@ -203,7 +203,7 @@ export default async function PromptScenarioPage({ params }: ScenarioPageParams)
                     {selectedPrompts.items.map((prompt) => (
                         <Link
                             key={prompt.id}
-                            href={`/prompts/${prompt.id}`}
+                            href={`/ai/prompts/${prompt.id}`}
                             className="glass glass-card"
                             style={{ padding: '1.25rem', textDecoration: 'none', color: 'inherit' }}
                         >

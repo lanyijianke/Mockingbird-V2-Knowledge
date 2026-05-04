@@ -4,10 +4,10 @@ import { buildRankingsLayoutMetadata } from '@/lib/seo/metadata';
 export const metadata = buildRankingsLayoutMetadata();
 
 const tabs = [
-    { href: '/rankings/github', icon: 'bi-github', label: 'GitHub Trending', color: '#58a6ff' },
-    { href: '/rankings/producthunt', icon: 'bi-rocket-takeoff', label: 'ProductHunt', color: '#ff6154' },
-    { href: '/rankings/skills-trending', icon: 'bi-fire', label: 'Skills Trending', color: '#f0883e' },
-    { href: '/rankings/skills-hot', icon: 'bi-lightning-charge', label: 'Skills Hot', color: '#e040fb' },
+    { href: '/ai/rankings/github', icon: 'bi-github', label: 'GitHub Trending', color: '#58a6ff' },
+    { href: '/ai/rankings/producthunt', icon: 'bi-rocket-takeoff', label: 'ProductHunt', color: '#ff6154' },
+    { href: '/ai/rankings/skills-trending', icon: 'bi-fire', label: 'Skills Trending', color: '#f0883e' },
+    { href: '/ai/rankings/skills-hot', icon: 'bi-lightning-charge', label: 'Skills Hot', color: '#e040fb' },
 ];
 
 export default function RankingsLayout({

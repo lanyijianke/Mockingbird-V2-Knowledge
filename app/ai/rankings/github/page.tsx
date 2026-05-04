@@ -8,19 +8,19 @@ import { buildCollectionPageJsonLd, buildItemListJsonLd, JsonLdScript } from '@/
 export const metadata: Metadata = buildRankingMetadata({
     title: 'GitHub Trending — 排行榜',
     description: '追踪 GitHub 全球最热门的开源项目，每 2 小时自动更新。',
-    canonicalPath: '/rankings/github',
+    canonicalPath: '/ai/rankings/github',
 });
 
 export const revalidate = 600;
-const PAGE_URL = buildAbsoluteUrl('/rankings/github');
+const PAGE_URL = buildAbsoluteUrl('/ai/rankings/github');
 const INTERNAL_LINKS = [
     {
-        href: '/rankings/producthunt',
+        href: '/ai/rankings/producthunt',
         title: '切换到 ProductHunt 热榜',
         description: '对照产品热度和开源趋势，观察哪些项目正在从代码走向产品化。',
     },
     {
-        href: '/prompts/categories/gemini-3',
+        href: '/ai/prompts/categories/gemini-3',
         title: 'Gemini 3 提示词分类',
         description: '继续结合多模态提示词模板，验证这些热门项目的实际可用场景。',
     },

@@ -20,12 +20,12 @@ const INTERNAL_LINKS = [
         description: '先看文章理解背景，再回到提示词库挑选更适合当前任务的模板。',
     },
     {
-        href: '/rankings/producthunt',
+        href: '/ai/rankings/producthunt',
         title: '查看 ProductHunt 热榜',
         description: '结合最新产品趋势，判断哪些提示词玩法已经具备真实场景需求。',
     },
     {
-        href: '/rankings/skills-trending',
+        href: '/ai/rankings/skills-trending',
         title: '切换到 Skills Trending',
         description: '从技能社区的热度变化里，继续寻找值得实验的新工具和工作流。',
     },
@@ -51,7 +51,7 @@ function buildPromptsCanonicalPath(page: number, category?: string): string {
     const parts: string[] = [];
     if (category) parts.push(`category=${encodeURIComponent(category)}`);
     if (page > 1) parts.push(`page=${page}`);
-    return parts.length > 0 ? `/prompts?${parts.join('&')}` : '/prompts';
+    return parts.length > 0 ? `/ai/prompts?${parts.join('&')}` : '/ai/prompts';
 }
 
 export async function generateMetadata({
@@ -106,7 +106,7 @@ export default async function PromptsPage({
 
             {/* 粘性搜索栏 */}
             <div className="prompts-sticky-header">
-                <form method="get" action="/prompts" className="prompts-search-bar">
+                <form method="get" action="/ai/prompts" className="prompts-search-bar">
                     <i className="bi bi-search" />
                     <input
                         type="text"
@@ -121,7 +121,7 @@ export default async function PromptsPage({
                 {/* 过滤胶囊 */}
                 <div className="prompts-filter-row">
                     <Link
-                        href="/prompts"
+                        href="/ai/prompts"
                         className={`filter-pill ${!category ? 'active' : ''}`}
                     >
                         全部
@@ -129,7 +129,7 @@ export default async function PromptsPage({
                     {promptCategories.map((cat) => (
                         <Link
                             key={cat.code}
-                            href={`/prompts?category=${cat.code}`}
+                            href={`/ai/prompts?category=${cat.code}`}
                             className={`filter-pill ${category === cat.code ? 'active' : ''}`}
                         >
                             {cat.name}

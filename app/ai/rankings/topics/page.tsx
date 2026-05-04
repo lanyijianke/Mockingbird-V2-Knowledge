@@ -12,19 +12,19 @@ import {
 export const metadata: Metadata = buildRankingMetadata({
     title: '热榜专题',
     description: '围绕 GitHub、ProductHunt 和 Skills 热榜衍生的专题页入口。',
-    canonicalPath: '/rankings/topics',
+    canonicalPath: '/ai/rankings/topics',
 });
 
 const rankingEntries = [
-    { href: '/rankings/github', icon: 'bi-github', accent: '#58a6ff', label: 'GitHub Trending' },
-    { href: '/rankings/producthunt', icon: 'bi-rocket-takeoff', accent: '#ff6154', label: 'ProductHunt' },
-    { href: '/rankings/skills-trending', icon: 'bi-fire', accent: '#f0883e', label: 'Skills Trending' },
-    { href: '/rankings/skills-hot', icon: 'bi-lightning-charge', accent: '#a371f7', label: 'Skills Hot' },
+    { href: '/ai/rankings/github', icon: 'bi-github', accent: '#58a6ff', label: 'GitHub Trending' },
+    { href: '/ai/rankings/producthunt', icon: 'bi-rocket-takeoff', accent: '#ff6154', label: 'ProductHunt' },
+    { href: '/ai/rankings/skills-trending', icon: 'bi-fire', accent: '#f0883e', label: 'Skills Trending' },
+    { href: '/ai/rankings/skills-hot', icon: 'bi-lightning-charge', accent: '#a371f7', label: 'Skills Hot' },
 ];
 
 export default function RankingTopicIndexPage() {
     const topicPages = getRankingTopicPages();
-    const pageUrl = buildAbsoluteUrl('/rankings/topics');
+    const pageUrl = buildAbsoluteUrl('/ai/rankings/topics');
 
     return (
         <div className="zone-producthunt">
@@ -32,7 +32,7 @@ export default function RankingTopicIndexPage() {
                 data={[
                     buildBreadcrumbJsonLd([
                         { name: '首页', url: buildAbsoluteUrl('/') },
-                        { name: '排行榜', url: buildAbsoluteUrl('/rankings/github') },
+                        { name: '排行榜', url: buildAbsoluteUrl('/ai/rankings/github') },
                         { name: '热榜专题', url: pageUrl },
                     ]),
                     buildCollectionPageJsonLd(

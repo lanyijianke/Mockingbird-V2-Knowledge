@@ -6,28 +6,28 @@ import { getSkillsShRankings } from '@/lib/services/ranking-cache';
 import { buildCollectionPageJsonLd, buildItemListJsonLd, JsonLdScript } from '@/lib/seo/schema';
 
 export const metadata: Metadata = buildRankingMetadata({
-    title: 'Skills Trending — 排行榜',
-    description: '最受社区关注的 AI 技能与工具，实时追踪趋势变化。',
-    canonicalPath: '/rankings/skills-trending',
+    title: 'Skills Hot — 排行榜',
+    description: '当下最火热的 AI 技能排行，发现社区最受欢迎的工具。',
+    canonicalPath: '/ai/rankings/skills-hot',
 });
 
 export const revalidate = 600;
-const PAGE_URL = buildAbsoluteUrl('/rankings/skills-trending');
+const PAGE_URL = buildAbsoluteUrl('/ai/rankings/skills-hot');
 const INTERNAL_LINKS = [
     {
-        href: '/rankings/skills-hot',
-        title: '查看 Skills Hot',
-        description: '对照长期关注度和短期爆发热度，识别哪些技能只是短暂上升，哪些已经进入主流。',
+        href: '/ai/rankings/skills-trending',
+        title: '查看 Skills Trending',
+        description: '从爆发热度切回持续趋势，判断哪些技能正在形成稳定关注。',
     },
     {
-        href: '/prompts/categories/gemini-3',
+        href: '/ai/prompts/categories/gemini-3',
         title: 'Gemini 3 提示词分类',
-        description: '把技能热度和提示词模板结合起来，快速验证是否有真实工作流价值。',
+        description: '把热门技能和提示词模板联动起来，快速验证可复用的实操路径。',
     },
     {
-        href: '/ai/articles/categories/tech-practice',
-        title: '技术实战文章分类',
-        description: '从技能与工具热度回流到系统化文章，补齐方法论和案例。',
+        href: '/ai/articles/categories/agents',
+        title: '智能体文章分类',
+        description: '把热门技能和系统化文章结合起来，快速补齐背景与方法论。',
     },
 ];
 
@@ -41,8 +41,8 @@ function sanitizeExternalUrl(url: string | null | undefined): string | null {
     }
 }
 
-export default async function SkillsTrendingPage() {
-    const rankings = await getSkillsShRankings('trending');
+export default async function SkillsHotPage() {
+    const rankings = await getSkillsShRankings('hot');
     const itemList = rankings.map((item) => ({
         name: item.skillName,
         url: sanitizeExternalUrl(item.skillUrl),
@@ -51,45 +51,37 @@ export default async function SkillsTrendingPage() {
     return (
         <div className="zone-skills">
             <JsonLdScript data={[
-                buildCollectionPageJsonLd('Skills.sh Trending 排行榜', '最受社区关注的 AI 技能与工具。', PAGE_URL),
-                buildItemListJsonLd('Skills.sh Trending 排行榜', '最受社区关注的 AI 技能与工具。', PAGE_URL, itemList),
+                buildCollectionPageJsonLd('Skills.sh Hot 排行榜', '当下最火热的 AI 技能排行。', PAGE_URL),
+                buildItemListJsonLd('Skills.sh Hot 排行榜', '当下最火热的 AI 技能排行。', PAGE_URL, itemList),
             ]} />
             <div className="zone-header">
-                <h1 className="zone-title zone-title-skills">
-                    <i className="bi bi-fire" /> Skills.sh Trending
+                <h1 className="zone-title zone-title-hot">
+                    <i className="bi bi-lightning-charge" /> Skills.sh Hot
                 </h1>
                 <p className="zone-subtitle">
-                    最受社区关注的 AI 技能与工具，实时追踪趋势变化。
+                    当下最火热的 AI 技能排行，发现社区最受欢迎的工具。
                 </p>
             </div>
 
             {rankings.length > 0 ? (
-                <div className="skills-list">
+                <div className="skills-grid">
                     {rankings.map((item, index) => (
-                        <div key={item.id} className="skills-card">
-                            <div className={`rank-badge ${index < 3 ? 'rank-top rank-skills' : ''}`}>
+                        <div key={item.id} className="skills-hot-card">
+                            <div className={`rank-badge ${index < 3 ? 'rank-top rank-hot' : ''}`}>
                                 #{index + 1}
                             </div>
-                            <div className="skills-body">
-                                <div className="skills-header">
-                                    <h3 className="skills-name">
-                                        <i className="bi bi-cpu" />
-                                        {(() => {
-                                            const safeSkillUrl = sanitizeExternalUrl(item.skillUrl);
-                                            if (!safeSkillUrl) return <span>{item.skillName}</span>;
-                                            return (
-                                                <a href={safeSkillUrl} target="_blank" rel="noopener noreferrer">
-                                                    {item.skillName}
-                                                </a>
-                                            );
-                                        })()}
-                                    </h3>
-                                    {item.installCount && (
-                                        <span className="install-count">
-                                            <i className="bi bi-download" /> {item.installCount}
-                                        </span>
-                                    )}
-                                </div>
+                            <div className="skills-hot-body">
+                                <h3 className="skills-hot-name">
+                                    {(() => {
+                                        const safeSkillUrl = sanitizeExternalUrl(item.skillUrl);
+                                        if (!safeSkillUrl) return <span>{item.skillName}</span>;
+                                        return (
+                                            <a href={safeSkillUrl} target="_blank" rel="noopener noreferrer">
+                                                {item.skillName}
+                                            </a>
+                                        );
+                                    })()}
+                                </h3>
                                 {item.repoFullName && (
                                     <div className="skills-repo">
                                         <i className="bi bi-github" />
@@ -104,6 +96,11 @@ export default async function SkillsTrendingPage() {
                                         })()}
                                     </div>
                                 )}
+                                {item.installCount && (
+                                    <div className="skills-hot-installs">
+                                        <i className="bi bi-download" /> {item.installCount} 安装
+                                    </div>
+                                )}
                                 {item.description && (
                                     <p className="skills-description">{item.description}</p>
                                 )}
@@ -114,16 +111,16 @@ export default async function SkillsTrendingPage() {
             ) : (
                 <div className="empty-state">
                     <i className="bi bi-cloud-slash" />
-                    <p>暂无 Trending 数据，请稍后再试。</p>
+                    <p>暂无 Hot 数据，请稍后再试。</p>
                 </div>
             )}
 
             <section className="home-section" style={{ marginTop: '3rem' }}>
                 <div className="section-bar">
-                    <h2 className="section-title">趋势线索延伸</h2>
+                    <h2 className="section-title">热门技能延伸探索</h2>
                 </div>
                 <p className="zone-subtitle" style={{ marginBottom: '1.25rem' }}>
-                    Skills Trending 更偏向“正在被讨论”的信号。继续查看 Hot、产品热榜和提示词模板，可以把关注度变成具体动作。
+                    Skills Hot 反映当下最强的短期关注度。继续对照 Trending、GitHub 和文章专题，能更快分辨“噪音”与“真实机会”。
                 </p>
                 <div
                     style={{
