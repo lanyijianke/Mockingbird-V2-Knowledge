@@ -8,6 +8,8 @@ import { NextRequest, NextResponse } from 'next/server';
 
 const PUBLIC_PREFIXES = [
     '/api/',
+    '/ai/',
+    '/finance/',
     '/prompts/',
     '/articles/',
     '/rankings',
