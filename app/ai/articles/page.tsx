@@ -16,17 +16,17 @@ const SITE_CONFIG = getSiteSeoConfig();
 const SITE_URL = SITE_CONFIG.siteUrl;
 const INTERNAL_LINKS = [
     {
-        href: '/prompts/categories/gemini-3',
+        href: '/ai/prompts/categories/gemini-3',
         title: 'Gemini 3 提示词分类',
         description: '把文章中的方法论快速落到具体提示词实践，适合继续上手实验。',
     },
     {
-        href: '/rankings/producthunt',
+        href: '/ai/rankings/producthunt',
         title: '切换到 ProductHunt 热榜',
         description: '从内容研究延伸到新产品趋势，观察哪些方向正在快速增长。',
     },
     {
-        href: '/rankings/github',
+        href: '/ai/rankings/github',
         title: '查看 GitHub Trending',
         description: '同步关注开源项目热度，补齐开发者生态中的技术实现信号。',
     },

@@ -19,12 +19,12 @@ const ARTICLE_EXPLORATION_LINKS = [
         description: '返回金融文章列表，查看同一主题下的宏观、市场与策略内容。',
     },
     {
-        href: '/rankings/github',
+        href: '/ai/rankings/github',
         title: '查看 GitHub 趋势项目',
         description: '把金融研究和开发工具趋势结合起来，快速发现值得跟进的项目。',
     },
     {
-        href: '/prompts',
+        href: '/ai/prompts',
         title: '查找分析类提示词',
         description: '补充适用于研究、摘要和数据整理场景的提示词模板。',
     },

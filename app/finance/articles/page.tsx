@@ -13,12 +13,12 @@ const SITE_CONFIG = getSiteSeoConfig();
 const SITE_URL = SITE_CONFIG.siteUrl;
 const INTERNAL_LINKS = [
     {
-        href: '/prompts',
+        href: '/ai/prompts',
         title: '查找研究类提示词',
         description: '把金融文章里的研究框架转成可复制的分析、摘要和对比提示词。',
     },
     {
-        href: '/rankings/github',
+        href: '/ai/rankings/github',
         title: '查看 GitHub Trending',
         description: '关注数据分析、量化工具和开发框架的开源趋势，补充技术信号。',
     },
