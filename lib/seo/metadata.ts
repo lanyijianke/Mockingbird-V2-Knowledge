@@ -204,7 +204,7 @@ export function buildArticleDetailMetadata(input: ArticleDetailMetadataInput): M
 }
 
 export function buildPromptDetailMetadata(input: PromptDetailMetadataInput): Metadata {
-    const canonicalPath = `/prompts/${input.id}`;
+    const canonicalPath = `/ai/prompts/${input.id}`;
     const description = input.description || input.content?.slice(0, 160) || undefined;
 
     return buildWebsiteMetadata({
