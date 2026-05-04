@@ -1,7 +1,5 @@
-import Link from 'next/link';
-import NavAuthButton from '@/app/NavAuthButton';
 import { ToastProvider } from '@/app/ToastContext';
-import { getArticleListPath } from '@/lib/articles/article-route-paths';
+import SiteNav from './SiteNav';
 import { buildAbsoluteUrl, getSiteSeoConfig } from '@/lib/seo/config';
 import { buildRootMetadata } from '@/lib/seo/metadata';
 import { buildWebSiteJsonLd, JsonLdScript } from '@/lib/seo/schema';
@@ -26,55 +24,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body>
         <ToastProvider>
-        {/* ═══ Top Navigation (Every.to Style) ═══ */}
-        <nav className="top-nav">
-          <div className="nav-left" />
-
-          <div className="nav-center">
-            <div className="nav-divider" />
-            <div className="nav-brand-name">
-              <Link href="/">{SITE_CONFIG.brandName}</Link>
-            </div>
-            <div className="nav-divider" />
-          </div>
-
-          <div className="nav-right">
-            <Link href="/" className="nav-link">首页</Link>
-            <Link href={getArticleListPath('ai')} className="nav-link">AI文章</Link>
-            <Link href={getArticleListPath('finance')} className="nav-link">金融文章</Link>
-            <Link href="/prompts" className="nav-link">提示词</Link>
-            <Link href="/rankings/topics" className="nav-link nav-mobile-only">热榜</Link>
-
-            {/* ═══ 热榜 — 父子菜单 ═══ */}
-            <div className="nav-dropdown nav-desktop-only">
-              <Link href="/rankings/github" className="nav-link nav-dropdown-trigger">
-                热榜 <i className="bi bi-chevron-down nav-dropdown-arrow" />
-              </Link>
-              <div className="nav-dropdown-menu">
-                <Link href="/rankings/github" className="nav-dropdown-item">
-                  <i className="bi bi-github" style={{ color: '#58a6ff' }} />
-                  <span>GitHub Trending</span>
-                </Link>
-                <Link href="/rankings/producthunt" className="nav-dropdown-item">
-                  <i className="bi bi-rocket-takeoff" style={{ color: '#ff6154' }} />
-                  <span>ProductHunt</span>
-                </Link>
-                <Link href="/rankings/skills-trending" className="nav-dropdown-item">
-                  <i className="bi bi-fire" style={{ color: '#f0883e' }} />
-                  <span>Skills Trending</span>
-                </Link>
-                <Link href="/rankings/skills-hot" className="nav-dropdown-item">
-                  <i className="bi bi-lightning-charge" style={{ color: '#a371f7' }} />
-                  <span>Skills Hot</span>
-                </Link>
-              </div>
-            </div>
-
-            <Link href="/academy/narratives" className="nav-link academy-link">学社</Link>
-
-            <NavAuthButton />
-          </div>
-        </nav>
+        {/* ═══ Top Navigation ═══ */}
+        <SiteNav />
 
         {/* ═══ Main Content ═══ */}
         <main className="main-content">
