@@ -13,10 +13,11 @@ export default function SiteNav() {
   const isBrandHome = pathname === '/';
   const isAi = pathname.startsWith('/ai');
   const isFinance = pathname.startsWith('/finance');
+  const isIntel = pathname.startsWith('/intel');
 
   if (isBrandHome) return null;
 
-  const brandHref = isAi ? '/ai' : isFinance ? '/finance' : '/';
+  const brandHref = isAi ? '/ai' : isFinance ? '/finance' : isIntel ? '/intel' : '/';
 
   return (
     <nav className="top-nav">
@@ -81,11 +82,21 @@ export default function SiteNav() {
           </>
         )}
 
+        {/* ── Intel subsite navigation ── */}
+        {isIntel && (
+          <>
+            <Link href="/intel" className="nav-link">情报站</Link>
+            <Link href="/academy/narratives" className="nav-link academy-link">学社</Link>
+            <NavAuthButton />
+          </>
+        )}
+
         {/* ── Default navigation (brand home, auth pages, profile, etc.) ── */}
-        {!isAi && !isFinance && (
+        {!isAi && !isFinance && !isIntel && (
           <>
             <Link href={getArticleListPath('ai')} className="nav-link">AI</Link>
             <Link href={getArticleListPath('finance')} className="nav-link">金融</Link>
+            <Link href="/intel" className="nav-link">情报站</Link>
             <Link href="/academy/narratives" className="nav-link academy-link">学社</Link>
             <NavAuthButton />
           </>

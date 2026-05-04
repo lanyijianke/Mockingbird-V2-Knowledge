@@ -10,6 +10,7 @@ const PUBLIC_PREFIXES = [
     '/api/',
     '/ai/',
     '/finance/',
+    '/intel/',   // 情报站页面公开访问
     '/prompts/',
     '/articles/',
     '/rankings',
