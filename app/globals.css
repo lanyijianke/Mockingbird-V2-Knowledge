@@ -4263,3 +4263,132 @@ h3:focus-visible {
 .rpt-subsection { margin-bottom: 1.5rem; }
 .rpt-subsection-title { font-size: 0.95rem; color: var(--text-main); font-weight: 600; margin-bottom: 0.6rem; padding-left: 0.8rem; border-left: 3px solid var(--academy-gold); }
 .rpt-subsection-body { font-size: 0.88rem; color: var(--text-muted); line-height: 1.85; }
+
+/* ═══ Brand Homepage ═══ */
+
+.brand-hero {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 55vh;
+    padding: 4rem 2rem;
+    text-align: center;
+}
+
+.brand-hero-title {
+    font-family: var(--font-serif);
+    font-size: 3.5rem;
+    font-weight: 700;
+    margin-bottom: 1.25rem;
+    background: linear-gradient(135deg, var(--accent), var(--academy-gold));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.brand-hero-slogan {
+    font-size: 1.35rem;
+    color: var(--text-main);
+    margin-bottom: 1rem;
+    font-weight: 400;
+}
+
+.brand-hero-desc {
+    font-size: 1rem;
+    color: var(--text-muted);
+    max-width: 560px;
+    line-height: 1.8;
+}
+
+.brand-entries {
+    padding: 0 0 2rem;
+}
+
+.brand-entries-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+}
+
+.brand-entry-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 2.5rem 2rem;
+    text-decoration: none;
+    color: var(--text-main);
+}
+
+.brand-entry-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--glass-shadow-hover);
+}
+
+.brand-entry-icon {
+    font-size: 2.5rem;
+    color: var(--accent);
+    margin-bottom: 1rem;
+}
+
+.brand-entry-title {
+    font-family: var(--font-serif);
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+}
+
+.brand-entry-desc {
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    line-height: 1.7;
+    margin-bottom: 1.25rem;
+}
+
+.brand-entry-action {
+    font-size: 0.9rem;
+    color: var(--accent);
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    transition: gap 0.3s ease;
+}
+
+.brand-entry-card:hover .brand-entry-action {
+    gap: 0.65rem;
+}
+
+.brand-academy {
+    padding: 0 0 3rem;
+}
+
+.brand-academy-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 2rem;
+    text-decoration: none;
+    color: var(--text-main);
+}
+
+.brand-academy-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--glass-shadow-hover);
+}
+
+.brand-academy-badge {
+    font-family: var(--font-serif);
+    font-size: 1.15rem;
+    color: var(--academy-gold);
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+}
+
+.brand-academy-desc {
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    line-height: 1.7;
+    margin-bottom: 1.25rem;
+}
