@@ -14,7 +14,7 @@ const SITE_URL = SITE_CONFIG.siteUrl;
 const LIST_PATH = getArticleListPath('finance');
 
 export const metadata: Metadata = buildArticlesListMetadata({
-    title: '金融知识库',
+    title: '金融',
     description: `浏览${SITE_CONFIG.siteName}的金融文章合集 — 宏观研究、市场分析与策略文章`,
     canonicalPath: '/finance',
 });
@@ -34,10 +34,10 @@ export default async function FinanceHomePage() {
             <JsonLdScript data={[
                 buildBreadcrumbJsonLd([
                     { name: '首页', url: SITE_URL },
-                    { name: '金融知识库', url: `${SITE_URL}/finance` },
+                    { name: '金融', url: `${SITE_URL}/finance` },
                 ]),
                 buildCollectionPageJsonLd(
-                    '金融知识库',
+                    '金融',
                     `浏览${SITE_CONFIG.siteName}的全部金融文章`,
                     `${SITE_URL}/finance`,
                 ),
@@ -50,7 +50,7 @@ export default async function FinanceHomePage() {
                     <span className="stat-divider">·</span>
                     <span className="stat-badge">{articleCategories.length} 个分类</span>
                 </div>
-                <h1 className="editorial-headline">金融知识库</h1>
+                <h1 className="editorial-headline">金融</h1>
                 <p className="editorial-sub">宏观研究、市场分析与策略文章，助你洞察金融趋势</p>
             </header>
 
@@ -133,12 +133,12 @@ export default async function FinanceHomePage() {
                 <div className="finance-empty">
                     <div className="finance-empty-inner glass glass-card">
                         <i className="bi bi-journal-richtext finance-empty-icon" />
-                        <h2 className="finance-empty-title">金融知识库正在建设中</h2>
+                        <h2 className="finance-empty-title">金融频道正在建设中</h2>
                         <p className="finance-empty-desc">
-                            我们正在筹备宏观研究、市场分析与策略方向的精选文章，敬请期待。
+                            我们正在筹备宏观研究、市场分析与策略方向的精选内容，敬请期待。
                         </p>
                         <Link href="/ai" className="finance-empty-link">
-                            先去看看 AI 知识库
+                            先去看看 AI 频道
                             <i className="bi bi-arrow-right" />
                         </Link>
                     </div>

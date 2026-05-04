@@ -1,5 +1,6 @@
 'use client';
 
+import './quicknews.css';
 import { useState, useEffect, useMemo, useCallback } from 'react';
 
 interface FeedItem {

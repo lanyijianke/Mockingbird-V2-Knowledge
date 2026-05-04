@@ -1,5 +1,6 @@
 'use client';
 
+import './narratives.css';
 import { useState, useEffect, useCallback } from 'react';
 
 // ═══ Types ═══
@@ -251,18 +252,18 @@ export default function NarrativesPage() {
                   const a = detail.articles.find(x => x.id === selectedArticleId);
                   if (!a) return null;
                   return (
-                    <div className="article-reader open">
-                      <div className="reader-header">
-                        <div className="reader-meta">
+                    <div className="narrative-reader open">
+                      <div className="narrative-reader-header">
+                        <div className="narrative-reader-meta">
                           <span><i className="bi bi-newspaper" /> {a.source}</span>
                           <span><i className="bi bi-calendar3" /> {a.publishedAt}</span>
                           {a.author && <span><i className="bi bi-person" /> {a.author}</span>}
                         </div>
-                        <div className="reader-actions">
+                        <div className="narrative-reader-actions">
                           <button className="reader-btn" onClick={() => setSelectedArticleId(null)}><i className="bi bi-x-lg" /> 关闭</button>
                         </div>
                       </div>
-                      <div className="reader-title">{a.title}</div>
+                      <div className="narrative-reader-title">{a.title}</div>
                       {a.reasoning && (
                         <div className="reader-section">
                           <div className="reader-section-label">AI 推理</div>

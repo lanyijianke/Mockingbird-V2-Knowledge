@@ -288,19 +288,7 @@
     border-radius: 12px;
 }
 
-/* ═══ Reveal Animation ═══ */
-.reader-content .reveal {
-    opacity: 0;
-    transform: translateY(16px);
-    filter: blur(3px);
-    transition: opacity 0.5s ease-out, transform 0.5s ease-out, filter 0.5s ease-out;
-}
-
-.reader-content .reveal.visible {
-    opacity: 1;
-    transform: translateY(0);
-    filter: blur(0);
-}
+/* ═══ Content Visibility ═══ */
 
 /* ═══ Paragraphs ═══ */
 .reader-content p {

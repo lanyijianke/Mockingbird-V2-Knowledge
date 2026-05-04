@@ -1,5 +1,6 @@
 'use client';
 
+import './articles.css';
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 
 interface Article {

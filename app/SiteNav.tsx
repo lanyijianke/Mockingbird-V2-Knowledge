@@ -10,8 +10,13 @@ export default function SiteNav() {
   const pathname = usePathname();
   const { brandName } = getSiteSeoConfig();
 
+  const isBrandHome = pathname === '/';
   const isAi = pathname.startsWith('/ai');
   const isFinance = pathname.startsWith('/finance');
+
+  if (isBrandHome) return null;
+
+  const brandHref = isAi ? '/ai' : isFinance ? '/finance' : '/';
 
   return (
     <nav className="top-nav">
@@ -20,7 +25,7 @@ export default function SiteNav() {
       <div className="nav-center">
         <div className="nav-divider" />
         <div className="nav-brand-name">
-          <Link href="/">{brandName}</Link>
+          <Link href={brandHref}>{brandName}</Link>
         </div>
         <div className="nav-divider" />
       </div>
@@ -79,8 +84,8 @@ export default function SiteNav() {
         {/* ── Default navigation (brand home, auth pages, profile, etc.) ── */}
         {!isAi && !isFinance && (
           <>
-            <Link href={getArticleListPath('ai')} className="nav-link">AI 知识库</Link>
-            <Link href={getArticleListPath('finance')} className="nav-link">金融知识库</Link>
+            <Link href={getArticleListPath('ai')} className="nav-link">AI</Link>
+            <Link href={getArticleListPath('finance')} className="nav-link">金融</Link>
             <Link href="/academy/narratives" className="nav-link academy-link">学社</Link>
             <NavAuthButton />
           </>

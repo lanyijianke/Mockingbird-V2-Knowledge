@@ -146,21 +146,7 @@ export default function ArticleReaderClient({
             });
         });
 
-        // --- Reveal animation: IntersectionObserver ---
-        const revealTargets = container.querySelectorAll('h2, h3, h4, h5, p, pre, blockquote, ul, ol, table');
-        revealTargets.forEach((el) => el.classList.add('reveal'));
-        const revealObserver = new IntersectionObserver(
-            (entries) => {
-                entries.forEach((entry) => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('visible');
-                    }
-                });
-            },
-            { threshold: 0.1, rootMargin: '0px 0px -50px 0px' }
-        );
-        revealTargets.forEach((el) => revealObserver.observe(el));
-        return () => revealObserver.disconnect();
+        // Cleanup code block and image handlers only
     }, [renderedHtml]);
 
     const scrollToId = useCallback((id: string) => {

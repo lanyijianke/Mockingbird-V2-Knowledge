@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import '@/app/academy/brand-academy-card.css';
 import { buildAbsoluteUrl, getSiteSeoConfig } from '@/lib/seo/config';
 import { buildHomePageMetadata } from '@/lib/seo/metadata';
 import { buildOrganizationJsonLd, buildWebPageJsonLd, JsonLdScript } from '@/lib/seo/schema';
@@ -29,50 +30,43 @@ export default function BrandHomePage() {
                 BRAND_SEO.webPageJsonLd,
             ]} />
 
-            {/* ═══ Brand Hero ═══ */}
+            {/* ═══ Full-viewport Hero ═══ */}
             <section className="brand-hero">
                 <h1 className="brand-hero-title">{brandName}</h1>
-                <p className="brand-hero-slogan">帮你在信息洪流中，发掘真正有价值的东西</p>
+                <p className="brand-hero-slogan">一群 AI 智能体组成的情报团队</p>
                 <p className="brand-hero-desc">
-                    {siteName} — 一个专注发掘与传递价值的知识平台。我们筛选、整理并呈现各领域最值得阅读的内容，让你的每一分钟都有收获。
+                    帮你从信息洪流中，看见真正重要的东西。
                 </p>
-            </section>
 
-            {/* ═══ Dual Entry Cards ═══ */}
-            <section className="brand-entries">
-                <div className="brand-entries-grid">
-                    <Link href="/ai" className="brand-entry-card glass glass-card">
-                        <i className="bi bi-cpu brand-entry-icon" />
-                        <h2 className="brand-entry-title">AI 知识库</h2>
-                        <p className="brand-entry-desc">
-                            深度文章、提示词精选与实时热榜，助你立于 AI 前沿
-                        </p>
-                        <span className="brand-entry-action">
-                            进入 <i className="bi bi-arrow-right" />
-                        </span>
+                <div className="brand-entries-row">
+                    <Link href="/ai" className="brand-entry-btn brand-entry-btn--ai">
+                        <i className="bi bi-cpu" />
+                        <span>AI</span>
+                        <i className="bi bi-arrow-right brand-entry-btn-arrow" />
                     </Link>
 
-                    <Link href="/finance" className="brand-entry-card glass glass-card">
-                        <i className="bi bi-graph-up-arrow brand-entry-icon" />
-                        <h2 className="brand-entry-title">金融知识库</h2>
-                        <p className="brand-entry-desc">
-                            宏观研判、市场信号与机构研报，把握金融脉搏
-                        </p>
-                        <span className="brand-entry-action">
-                            进入 <i className="bi bi-arrow-right" />
-                        </span>
+                    <Link href="/finance" className="brand-entry-btn brand-entry-btn--finance">
+                        <i className="bi bi-graph-up-arrow" />
+                        <span>金融</span>
+                        <i className="bi bi-arrow-right brand-entry-btn-arrow" />
                     </Link>
+                </div>
+
+                <div className="brand-scroll-hint">
+                    <i className="bi bi-chevron-down" />
                 </div>
             </section>
 
-            {/* ═══ Academy Promo ═══ */}
+            {/* ═══ Academy ═══ */}
             <section className="brand-academy">
-                <Link href="/academy/narratives" className="brand-academy-card glass glass-card">
-                    <span className="brand-academy-badge">知更鸟学社</span>
-                    <p className="brand-academy-desc">
-                        每日精选叙事解读、快讯洞察与深度研报，培养独立判断力
-                    </p>
-                    <span className="brand-entry-action">
+                <Link href="/academy/narratives" className="brand-academy-card">
+                    <div className="brand-academy-left">
+                        <span className="brand-academy-badge">知更鸟学社</span>
+                        <p className="brand-academy-desc">
+                            每日精选叙事解读、快讯洞察与深度研报，培养独立判断力
+                        </p>
+                    </div>
+                    <span className="brand-academy-action">
                         了解更多 <i className="bi bi-arrow-right" />
                     </span>
                 </Link>

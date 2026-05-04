@@ -111,6 +111,7 @@ export default function PromptGalleryCard({
                         className={`pc2-cover-image ${isPreviewActive ? 'is-hidden' : ''}`}
                         sizes="(max-width: 480px) 50vw, (max-width: 768px) 33vw, 25vw"
                         style={{ objectFit: 'cover' }}
+                        unoptimized
                     />
                 ) : (
                     <div className="pc2-cover-empty">

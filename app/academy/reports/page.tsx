@@ -1,5 +1,6 @@
 'use client';
 
+import './reports.css';
 import { useState, useEffect, useCallback } from 'react';
 
 interface Report {

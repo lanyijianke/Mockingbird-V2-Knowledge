@@ -63,7 +63,7 @@ export function getSiteSeoConfig(): SiteSeoConfig {
         homeDescription: brand.homeDescription,
         serviceName: brand.serviceName,
         locale: 'zh_CN',
-        defaultTitle: `${brand.siteName} - AI 教程 | AI 实践 | AI 提示词 | AI 工具`,
+        defaultTitle: `${brand.siteName} - AI 智能体情报团队`,
         titleTemplate: `%s - ${brand.siteName}`,
         defaultDescription: brand.defaultDescription,
         canIndex: parseBoolean(process.env.SEO_CAN_INDEX, false),
