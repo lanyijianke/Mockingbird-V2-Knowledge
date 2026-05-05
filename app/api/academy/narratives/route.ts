@@ -3,6 +3,17 @@ import { query } from '@/lib/db-console';
 
 export const runtime = 'nodejs';
 
+const phaseMap: Record<number, string> = { 0: 'Emerging', 1: 'Rising', 2: 'Peak', 3: 'Cooling' };
+
+function mapCategory(cat: string): { domain: string; categoryPath: string } {
+    const c = (cat || 'ai').toLowerCase();
+    if (c === 'ai') return { domain: 'ai', categoryPath: 'AI' };
+    if (c === 'web3') return { domain: 'finance', categoryPath: 'Finance/Web3' };
+    if (c === 'finance') return { domain: 'finance', categoryPath: 'Finance' };
+    if (c === 'global') return { domain: 'global', categoryPath: 'Global' };
+    return { domain: c, categoryPath: cat };
+}
+
 export async function GET() {
     try {
         const rows = await query<{
@@ -25,21 +36,24 @@ export async function GET() {
              ORDER BY ObjectiveSignalStrength DESC`
         );
 
-        const phaseMap: Record<number, string> = { 0: 'Emerging', 1: 'Rising', 2: 'Peak', 3: 'Cooling' };
-
-        const narratives = rows.map((r, i) => ({
-            id: r.Id,
-            rank: i + 1,
-            title: r.Title,
-            summary: r.Description,
-            category: (r.Category || 'ai').toLowerCase(),
-            phase: phaseMap[r.Phase] ?? 'Emerging',
-            heatScore: r.ObjectiveSignalStrength ?? 0,
-            articleCount: r.RelatedArticleCount ?? 0,
-            signalStrength: r.SignalStrength || null,
-            coreEntities: r.CoreEntities ? r.CoreEntities.split(',').map((s: string) => s.trim()).filter(Boolean) : [],
-            createdAt: r.CreatedAt,
-        }));
+        const narratives = rows.map((r, i) => {
+            const { domain, categoryPath } = mapCategory(r.Category);
+            return {
+                id: r.Id,
+                rank: i + 1,
+                title: r.Title,
+                summary: r.Description,
+                category: (r.Category || 'ai').toLowerCase(),
+                domain,
+                categoryPath,
+                phase: phaseMap[r.Phase] ?? 'Emerging',
+                heatScore: r.ObjectiveSignalStrength ?? 0,
+                articleCount: r.RelatedArticleCount ?? 0,
+                signalStrength: r.SignalStrength || null,
+                coreEntities: r.CoreEntities ? r.CoreEntities.split(',').map((s: string) => s.trim()).filter(Boolean) : [],
+                createdAt: r.CreatedAt,
+            };
+        });
 
         return NextResponse.json({ success: true, data: narratives });
     } catch (err) {
