@@ -12,6 +12,9 @@ interface QuickNewsItem {
   summary: string;
   qualityScore: number | null;
   crawlTime: string;
+  domain: string;
+  categoryPath: string;
+  keywords: string[];
   tags: string[];
   url?: string;
 }
@@ -21,6 +24,8 @@ interface NarrativeItem {
   title: string;
   summary: string;
   category: string;
+  domain: string;
+  categoryPath: string;
   phase: 'Emerging' | 'Rising' | 'Peak' | 'Cooling';
   heatScore: number;
   articleCount: number;
@@ -55,7 +60,7 @@ interface UserInfo {
 
 type TabKey = 'news' | 'narratives' | 'kol';
 type SortMode = 'time' | 'score';
-type NarrFilter = 'all' | 'ai' | 'web3' | 'finance';
+type NarrFilter = 'all' | 'ai' | 'finance' | 'global';
 
 const NEWS_FREE_LIMIT = 20;
 const NARR_FREE_LIMIT = 5;
@@ -81,11 +86,10 @@ function formatDate(s: string) {
 
 function isNew(s: string) { return Date.now() - new Date(s).getTime() < 3600000; }
 
-function catClass(c: string) {
-  const l = c.toLowerCase();
-  if (l === 'ai') return 'ai';
-  if (l === 'web3') return 'web3';
-  if (l === 'finance') return 'finance';
+function catClass(domain: string) {
+  if (domain === 'ai') return 'ai';
+  if (domain === 'finance') return 'finance';
+  if (domain === 'global') return 'global';
   return 'default';
 }
 
@@ -166,7 +170,7 @@ export default function IntelPage() {
   const lockedNewsCount = member ? 0 : Math.max(0, news.length - NEWS_FREE_LIMIT);
   const groupedNews = groupByDate(visibleNews);
 
-  const filteredNarr = narrFilter === 'all' ? narratives : narratives.filter(n => n.category.toLowerCase() === narrFilter);
+  const filteredNarr = narrFilter === 'all' ? narratives : narratives.filter(n => n.domain === narrFilter);
   const visibleNarr = member ? filteredNarr : filteredNarr.slice(0, NARR_FREE_LIMIT);
   const lockedNarrItems = member ? [] : filteredNarr.slice(NARR_FREE_LIMIT);
 
@@ -259,9 +263,20 @@ export default function IntelPage() {
                 </div>
                 <div className="intel-news-card-title">{item.title}</div>
                 <div className="intel-news-card-summary">{item.summary}</div>
-                {item.tags.length > 0 && (
+                {(item.categoryPath || item.tags.length > 0) && (
                   <div className="intel-news-card-tags">
-                    {[...new Set(item.tags)].slice(0, 4).map(tag => (
+                    {item.categoryPath ? (() => {
+                      const parts = item.categoryPath.split('/').filter(Boolean);
+                      return parts.map((part, i) => (
+                        <span key={i}>
+                          {i === 0 ? (
+                            <span className={`intel-cat intel-cat--${catClass(item.domain)}`}>{part}</span>
+                          ) : (
+                            <span className={`intel-subcat ${item.domain}`}>{part}</span>
+                          )}
+                        </span>
+                      ));
+                    })() : [...new Set(item.tags)].slice(0, 4).map(tag => (
                       <span key={tag} className="intel-news-card-tag">{tag}</span>
                     ))}
                   </div>
@@ -299,9 +314,9 @@ export default function IntelPage() {
       {/* Narratives Panel */}
       <div className={`intel-panel ${tab === 'narratives' ? 'active' : ''}`}>
         <div className="intel-narr-filters">
-          {(['all', 'ai', 'web3', 'finance'] as NarrFilter[]).map(c => (
+          {(['all', 'ai', 'finance', 'global'] as NarrFilter[]).map(c => (
             <button key={c} className={`intel-narr-filter-btn ${narrFilter === c ? 'active' : ''}`} onClick={() => setNarrFilter(c)}>
-              {c === 'all' ? '全部' : c === 'ai' ? 'AI' : c === 'web3' ? 'Web3' : '金融'}
+              {c === 'all' ? '全部' : c === 'ai' ? 'AI' : c === 'finance' ? '金融' : 'Global'}
             </button>
           ))}
         </div>
@@ -315,7 +330,7 @@ export default function IntelPage() {
               <div className="intel-narr-card-top">
                 <span className="intel-narr-card-rank">#{String(idx + 1).padStart(2, '0')}</span>
                 <div className="intel-narr-card-badges">
-                  <span className={`intel-cat intel-cat--${catClass(item.category)}`}>{item.category.toUpperCase()}</span>
+                  <span className={`intel-cat intel-cat--${catClass(item.domain)}`}>{(item.categoryPath.split('/')[0] || item.category).toUpperCase()}</span>
                   <span className={`intel-phase intel-phase--${item.phase.toLowerCase()}`}>{PHASE_LABEL[item.phase]}</span>
                   {item.signalStrength && <span className="intel-narr-signal">{signalLabel(item.signalStrength)}</span>}
                 </div>
