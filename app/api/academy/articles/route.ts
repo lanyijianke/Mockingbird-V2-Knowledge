@@ -6,6 +6,7 @@ export const runtime = 'nodejs';
 export async function GET(request: NextRequest) {
     try {
         const { searchParams } = request.nextUrl;
+        const domain = searchParams.get('domain') || '';
         const category = searchParams.get('category') || '';
         const search = searchParams.get('search') || '';
         const source = searchParams.get('source') || '';
@@ -17,8 +18,14 @@ export async function GET(request: NextRequest) {
         const params: (string | number)[] = [];
 
         if (category) {
-            conditions.push('(t.Tags = ? OR t.Tags LIKE ?)');
-            params.push(category, category + ',%');
+            const normalized = category.toLowerCase() === 'web3' ? 'Finance/Web3' : category;
+            conditions.push('(t.Domain = ? OR t.CategoryPath = ? OR t.CategoryPath LIKE ?)');
+            params.push(normalized, normalized, normalized + '/%');
+        }
+
+        if (domain) {
+            conditions.push('(t.Domain = ? OR t.CategoryPath LIKE ?)');
+            params.push(domain, domain + '/%');
         }
 
         if (search) {
@@ -42,11 +49,15 @@ export async function GET(request: NextRequest) {
             Id: number; Title: string; Source: string; Content: string;
             Url: string; Author: string; CrawlTime: string; IngestedAt: string;
             Images: string;
-            AiSummary: string; AiReasoning: string; QualityScore: number; Tags: string;
+            AiSummary: string; AiReasoning: string; QualityScore: number;
+            Domain: string; CategoryPath: string; KeywordsJson: string;
         }>(
             `SELECT i.Id, i.Title, i.Source, i.Content, i.Url, i.Author,
                     i.CrawlTime, i.IngestedAt, i.Images,
-                    t.AiSummary, t.AiReasoning, t.QualityScore, t.Tags
+                    t.AiSummary, t.AiReasoning, t.QualityScore,
+                    COALESCE(t.Domain, '') as Domain,
+                    COALESCE(t.CategoryPath, '') as CategoryPath,
+                    COALESCE(t.KeywordsJson, '[]') as KeywordsJson
              FROM IntelligenceItems i
              LEFT JOIN IntelligenceTaggings t ON t.ItemId = i.Id
              WHERE ${where}
@@ -55,7 +66,6 @@ export async function GET(request: NextRequest) {
             [...params, limit, offset]
         );
 
-        // Get total count for pagination
         const countRows = await query<{ cnt: number }>(
             `SELECT COUNT(*) as cnt
              FROM IntelligenceItems i
@@ -71,11 +81,18 @@ export async function GET(request: NextRequest) {
                 if (Array.isArray(parsed)) images = parsed.filter((u: string) => typeof u === 'string');
             } catch { /* ignore */ }
 
-            // Strip HTML tags from content preview
             let preview = item.Content || '';
             preview = preview.replace(/<img[^>]*\/?>/gi, '');
             preview = preview.replace(/<(?!\/?(?:span|a|b|i|em|strong)\b)[^>]+>/gi, '');
             if (preview.length > 400) preview = preview.slice(0, 400) + '...';
+
+            let keywords: string[] = [];
+            try {
+                keywords = JSON.parse(item.KeywordsJson || '[]');
+            } catch { /* ignore */ }
+
+            const pathParts = item.CategoryPath.split('/').filter(Boolean);
+            const tags = [...new Set([...pathParts, ...keywords])];
 
             return {
                 id: item.Id,
@@ -87,7 +104,10 @@ export async function GET(request: NextRequest) {
                 crawlTime: item.CrawlTime,
                 ingestedAt: item.IngestedAt,
                 aiReasoning: item.AiReasoning || '',
-                tags: item.Tags ? item.Tags.split(',').map((t: string) => t.trim()).filter(Boolean) : [],
+                domain: item.Domain.toLowerCase(),
+                categoryPath: item.CategoryPath,
+                keywords,
+                tags,
                 url: item.Url || '',
                 images: images.slice(0, 3),
             };

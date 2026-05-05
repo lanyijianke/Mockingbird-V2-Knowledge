@@ -65,6 +65,22 @@ npm run invite:generate  # Generate membership invite codes
 - `membership/redeem` — invite code redemption
 - `health` — health check
 
+## CSS Architecture
+
+CSS 按功能模块隔离，每个功能的样式只在自己的路由树下加载，防止类名冲突。
+
+**文件结构：**
+- `app/globals.css`（~230 行）— 全站基础：tokens、reset、glass、footer、scrollbar、动画、toast。**禁止往这里加功能样式。**
+- `app/_styles/` — 跨路由共享的功能 CSS，通过 layout 导入
+- 各功能目录就近存放自己的 CSS（academy、articles/[slug]、ai/prompts/[id]）
+
+**导入规则：**
+- 功能 CSS 只在对应 layout 或 page 中导入，确保其他路由不会加载
+- 新增页面样式时，创建独立 CSS 文件并在该页面的 layout/page 中 import
+- **永远不要**把页面专属样式放进 globals.css
+
+**已知教训：** 之前学社的 `.article-reader { display: none }` 放在 globals.css 里，把新文章阅读器也隐藏了。现在通过文件隔离彻底杜绝此类问题。
+
 ## Conventions
 
 - All API routes use `export const runtime = 'nodejs'` for MySQL access

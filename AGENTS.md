@@ -28,6 +28,13 @@
 - Keep commits scoped to one concern.
 - PRs should summarize user-facing impact, config/env changes, and exact verification run (`npm test`, `npm run lint`, `npm run build`). Include screenshots for UI/email template changes when relevant.
 
+## CSS Architecture & Styling
+- **`app/globals.css`** (~230 lines) contains only site-wide primitives: CSS custom properties, reset, `.glass` / `.glass-card`, `.site-footer`, scrollbar, shared animations, and toast. **Never add feature-specific styles here.**
+- Feature CSS lives in `app/_styles/` (shared across subsites) or co-located with the feature (e.g., `app/academy/narratives/narratives.css`).
+- Each feature's CSS is imported only in its own layout or page, so styles from one route tree cannot affect another.
+- New pages must create their own CSS file and import it at the page or layout level.
+- Historical context: mixing all CSS in `globals.css` once caused `.article-reader { display: none }` from academy to hide the new article reader on a completely unrelated page. The current isolation prevents this class of bug.
+
 ## Security & Configuration Tips
 - Copy `.env.example` to `.env.local`; never commit secrets.
 - Treat `SITE_URL`, OAuth credentials, admin tokens, and Resend sender settings as environment-owned values.

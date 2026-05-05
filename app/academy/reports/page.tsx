@@ -1,11 +1,14 @@
 'use client';
 
+import './reports.css';
 import { useState, useEffect, useCallback } from 'react';
 
 interface Report {
   id: number;
   title: string;
   category: string;
+  domain: string;
+  categoryPath: string;
   summary: string;
   articleCount: number;
   narrativeCount: number;
@@ -13,12 +16,10 @@ interface Report {
 }
 
 interface ReportDetail {
-  id: number;
-  title: string;
-  category: string;
+  id: number; title: string; category: string;
+  domain: string; categoryPath: string;
   createdAt: string;
-  articleCount: number;
-  narrativeCount: number;
+  articleCount: number; narrativeCount: number;
   executiveSummary: string;
   signalSummary: {
     objectiveSignalStrength?: number;
@@ -92,7 +93,7 @@ export default function ReportsPage() {
 
   const filteredReports = activeCategory === 'all'
     ? reports
-    : reports.filter(r => r.category === activeCategory);
+    : reports.filter(r => r.domain === activeCategory);
 
   const selected = reports.find(r => r.id === selectedId);
   const action = selected ? (actionMap[selected.category] || { icon: 'bi-eye', label: '常规观望', cls: 'watch' }) : null;
@@ -107,7 +108,7 @@ export default function ReportsPage() {
         <div className="report-list-header">
           <div className="report-list-title">市场研报</div>
           <div className="report-filters">
-            {['all', 'ai', 'web3', 'finance'].map(cat => (
+            {['all', 'ai', 'finance', 'global'].map(cat => (
               <button
                 key={cat}
                 className={`rpt-filter-btn ${activeCategory === cat ? 'active' : ''}`}
@@ -127,7 +128,7 @@ export default function ReportsPage() {
             >
               <div className="rpt-item-top">
                 <div className="rpt-item-badges">
-                  <span className={`rpt-cat ${r.category}`}>{r.category.toUpperCase()}</span>
+                  <span className={`rpt-cat ${r.domain}`}>{r.categoryPath.split('/')[0] || r.category.toUpperCase()}</span>
                 </div>
                 <span className="rpt-item-date">{formatDate(r.createdAt)}</span>
               </div>

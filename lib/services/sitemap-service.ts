@@ -37,11 +37,11 @@ function buildStaticSitemapEntries(now: string): SitemapUrlEntry[] {
     if (!getSiteSeoConfig().canIndex) return [];
 
     const promptScenarioPaths = [
-        '/prompts/scenarios',
+        '/ai/prompts/scenarios',
         ...getPromptScenarioPages().map((page) => page.canonicalPath),
     ];
     const rankingTopicPaths = [
-        '/rankings/topics',
+        '/ai/rankings/topics',
         ...getRankingTopicPages().map((page) => page.canonicalPath),
     ];
 
@@ -49,22 +49,22 @@ function buildStaticSitemapEntries(now: string): SitemapUrlEntry[] {
         { url: buildAbsoluteUrl('/'), lastModified: now, changeFrequency: 'daily', priority: 1.0 },
         { url: buildAbsoluteUrl('/ai/articles'), lastModified: now, changeFrequency: 'daily', priority: 0.8 },
         { url: buildAbsoluteUrl('/finance/articles'), lastModified: now, changeFrequency: 'daily', priority: 0.8 },
-        { url: buildAbsoluteUrl('/prompts'), lastModified: now, changeFrequency: 'daily', priority: 0.8 },
-        { url: buildAbsoluteUrl('/rankings/github'), lastModified: now, changeFrequency: 'daily', priority: 0.6 },
-        { url: buildAbsoluteUrl('/rankings/producthunt'), lastModified: now, changeFrequency: 'daily', priority: 0.6 },
-        { url: buildAbsoluteUrl('/rankings/skills-trending'), lastModified: now, changeFrequency: 'daily', priority: 0.6 },
-        { url: buildAbsoluteUrl('/rankings/skills-hot'), lastModified: now, changeFrequency: 'daily', priority: 0.6 },
+        { url: buildAbsoluteUrl('/ai/prompts'), lastModified: now, changeFrequency: 'daily', priority: 0.8 },
+        { url: buildAbsoluteUrl('/ai/rankings/github'), lastModified: now, changeFrequency: 'daily', priority: 0.6 },
+        { url: buildAbsoluteUrl('/ai/rankings/producthunt'), lastModified: now, changeFrequency: 'daily', priority: 0.6 },
+        { url: buildAbsoluteUrl('/ai/rankings/skills-trending'), lastModified: now, changeFrequency: 'daily', priority: 0.6 },
+        { url: buildAbsoluteUrl('/ai/rankings/skills-hot'), lastModified: now, changeFrequency: 'daily', priority: 0.6 },
         ...promptScenarioPaths.map((path) => ({
             url: buildAbsoluteUrl(path),
             lastModified: now,
             changeFrequency: 'weekly' as const,
-            priority: path === '/prompts/scenarios' ? 0.7 : 0.6,
+            priority: path === '/ai/prompts/scenarios' ? 0.7 : 0.6,
         })),
         ...rankingTopicPaths.map((path) => ({
             url: buildAbsoluteUrl(path),
             lastModified: now,
             changeFrequency: 'weekly' as const,
-            priority: path === '/rankings/topics' ? 0.7 : 0.6,
+            priority: path === '/ai/rankings/topics' ? 0.7 : 0.6,
         })),
     ];
 }
@@ -127,7 +127,7 @@ export async function buildSitemapChunkEntries(chunkName: string): Promise<Sitem
         if (index < 0 || index >= chunks.length) return null;
 
         return chunks[index].map((prompt) => ({
-            url: buildAbsoluteUrl(`/prompts/${prompt.id}`),
+            url: buildAbsoluteUrl(`/ai/prompts/${prompt.id}`),
             lastModified: toIsoOrFallback(prompt.lastModified, now),
             changeFrequency: 'weekly',
             priority: 0.6,

@@ -134,12 +134,12 @@ export default async function AiArticleDetailPage({
             description: `进入 ${article.categoryName} 分类页，集中浏览同主题文章。`,
         },
         {
-            href: '/prompts/categories/gemini-3',
+            href: '/ai/prompts/categories/gemini-3',
             title: '相关提示词分类',
             description: '从文章切到可直接复用的多模态提示词模板，缩短落地路径。',
         },
         {
-            href: '/rankings/producthunt',
+            href: '/ai/rankings/producthunt',
             title: '跟进 ProductHunt 热榜',
             description: '结合热门新产品观察 AI 工具趋势，补充文章里的行业上下文。',
         },

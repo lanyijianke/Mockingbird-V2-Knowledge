@@ -167,7 +167,7 @@ export default async function AiArticleCategoryLandingPage({
                         </Link>
                     ))}
                     <Link
-                        href="/prompts/categories/gemini-3"
+                        href="/ai/prompts/categories/gemini-3"
                         className="glass glass-card"
                         style={{ padding: '1.25rem', textDecoration: 'none', color: 'inherit' }}
                     >

@@ -9,11 +9,15 @@ export async function GET() {
             Id: number; Title: string; Source: string; ContentType: string;
             Content: string; CrawlTime: string; IngestedAt: string;
             Url: string; Images: string;
-            AiSummary: string; AiReasoning: string; QualityScore: number; Tags: string;
+            AiSummary: string; AiReasoning: string; QualityScore: number;
+            Domain: string; CategoryPath: string; KeywordsJson: string;
         }>(
             `SELECT i.Id, i.Title, i.Source, i.ContentType, i.Content,
                     i.CrawlTime, i.IngestedAt, i.Url, i.Images,
-                    t.AiSummary, t.AiReasoning, t.QualityScore, t.Tags
+                    t.AiSummary, t.AiReasoning, t.QualityScore,
+                    COALESCE(t.Domain, '') as Domain,
+                    COALESCE(t.CategoryPath, '') as CategoryPath,
+                    COALESCE(t.KeywordsJson, '[]') as KeywordsJson
              FROM IntelligenceItems i
              LEFT JOIN IntelligenceTaggings t ON t.ItemId = i.Id
              WHERE i.LifecycleStatus = 0
@@ -29,6 +33,14 @@ export async function GET() {
                 if (Array.isArray(parsed)) images = parsed.filter((u: string) => typeof u === 'string');
             } catch { /* ignore */ }
 
+            let keywords: string[] = [];
+            try {
+                keywords = JSON.parse(item.KeywordsJson || '[]');
+            } catch { /* ignore */ }
+
+            const pathParts = item.CategoryPath.split('/').filter(Boolean);
+            const tags = [...new Set([...pathParts, ...keywords])];
+
             return {
                 id: item.Id,
                 title: item.Title || '',
@@ -39,7 +51,10 @@ export async function GET() {
                 ingestedAt: item.IngestedAt,
                 contentType: item.ContentType,
                 aiReasoning: item.AiReasoning || '',
-                tags: item.Tags ? item.Tags.split(',').map((t: string) => t.trim()).filter(Boolean) : [],
+                domain: item.Domain.toLowerCase(),
+                categoryPath: item.CategoryPath,
+                keywords,
+                tags,
                 url: item.Url || '',
                 images,
             };

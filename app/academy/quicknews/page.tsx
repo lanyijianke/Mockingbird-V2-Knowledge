@@ -1,5 +1,6 @@
 'use client';
 
+import './quicknews.css';
 import { useState, useEffect, useMemo, useCallback } from 'react';
 
 interface FeedItem {
@@ -12,26 +13,12 @@ interface FeedItem {
   ingestedAt: string;
   contentType: string;
   aiReasoning: string;
+  domain: string;
+  categoryPath: string;
+  keywords: string[];
   tags: string[];
   url: string;
   images: string[];
-  category?: string;
-}
-
-function inferCategory(title: string): string | null {
-  const t = title.toLowerCase();
-  if (/ai|模型|llm|gpt|claude|gemini|openai|deepmind|llama|大模型|豆包|文心|端侧|mistral|pixtral|nvidia/.test(t)) return 'ai';
-  if (/比特币|以太坊|defi|web3|solana|etf|crypto|uniswap|vitalik|币|链|token|nft|区块链|circle|hooks|pectra/.test(t)) return 'web3';
-  if (/美联储|降息|pmi|股市|日元|黄金|港股|a股|英伟达|财报|加息|通胀|利率|宏观|中芯|算力|美联储|fomc/.test(t)) return 'finance';
-  return null;
-}
-
-function categoryFromTags(tags: string[]): string | null {
-  const upper = tags.map(t => t.toUpperCase());
-  if (upper.includes('WEB3') || upper.includes('CRYPTO') || upper.includes('DEFI') || upper.includes('BLOCKCHAIN')) return 'web3';
-  if (upper.includes('AI') || upper.includes('LLM') || upper.includes('GPT')) return 'ai';
-  if (upper.includes('FINANCE') || upper.includes('MACRO') || upper.includes('FED')) return 'finance';
-  return null;
 }
 
 function formatTime(dt: string): string {
@@ -64,13 +51,51 @@ function getDateLabel(dateKey: string): string {
 }
 
 type SortMode = 'time' | 'score';
+type DomainFilter = 'all' | 'ai' | 'finance' | 'global';
+
+const DOMAINS: { key: DomainFilter; label: string }[] = [
+  { key: 'all', label: '全部' },
+  { key: 'ai', label: 'AI' },
+  { key: 'finance', label: 'Finance' },
+  { key: 'global', label: 'Global' },
+];
+
+function TaxonomyBadges({ domain, categoryPath, keywords }: { domain: string; categoryPath: string; keywords: string[] }) {
+  const parts = categoryPath.split('/').filter(Boolean);
+  if (parts.length === 0) return null;
+  return (
+    <span className="feed-taxonomy">
+      {parts.map((part, i) => (
+        <span key={i}>
+          {i === 0 ? (
+            <span className={`feed-domain-badge ${domain}`}>{part}</span>
+          ) : (
+            <>
+              <span className="feed-taxonomy-sep">/</span>
+              <span className={`feed-subcat-badge ${domain}`}>{part}</span>
+            </>
+          )}
+        </span>
+      ))}
+      {keywords.length > 0 && (
+        <>
+          <span className="feed-taxonomy-divider">|</span>
+          {keywords.slice(0, 3).map((kw, i) => (
+            <span key={i} className="feed-kw-chip">{kw}</span>
+          ))}
+        </>
+      )}
+    </span>
+  );
+}
 
 export default function QuickNewsPage() {
   const [items, setItems] = useState<FeedItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [expanded, setExpanded] = useState<Set<number>>(new Set());
-  const [activeCategory, setActiveCategory] = useState<string>('all');
+  const [activeDomain, setActiveDomain] = useState<DomainFilter>('all');
+  const [activeSubcat, setActiveSubcat] = useState<string>('');
   const [sortMode, setSortMode] = useState<SortMode>('time');
   const [sortOpen, setSortOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
@@ -80,15 +105,8 @@ export default function QuickNewsPage() {
     fetch('/api/academy/quicknews')
       .then(r => r.json())
       .then(res => {
-        if (res.success) {
-          const enriched = res.data.map((item: FeedItem) => ({
-            ...item,
-            category: categoryFromTags(item.tags || []) || inferCategory(item.title) || undefined,
-          }));
-          setItems(enriched);
-        } else {
-          setError(res.error);
-        }
+        if (res.success) setItems(res.data);
+        else setError(res.error);
       })
       .catch(err => setError(err.message))
       .finally(() => setLoading(false));
@@ -103,11 +121,30 @@ export default function QuickNewsPage() {
     });
   }, []);
 
+  const subcategories = useMemo(() => {
+    if (activeDomain === 'all') return [];
+    const subs = new Set<string>();
+    items.forEach(item => {
+      if (item.domain === activeDomain) {
+        const parts = item.categoryPath.split('/').filter(Boolean);
+        if (parts.length > 1) subs.add(parts[1]);
+      }
+    });
+    return [...subs].sort();
+  }, [items, activeDomain]);
+
   const filteredItems = useMemo(() => {
     let result = items;
 
-    if (activeCategory !== 'all') {
-      result = result.filter(item => item.category === activeCategory);
+    if (activeDomain !== 'all') {
+      result = result.filter(item => item.domain === activeDomain);
+    }
+
+    if (activeSubcat) {
+      result = result.filter(item => {
+        const parts = item.categoryPath.split('/').filter(Boolean);
+        return parts.length > 1 && parts[1] === activeSubcat;
+      });
     }
 
     if (searchQuery.trim()) {
@@ -115,7 +152,7 @@ export default function QuickNewsPage() {
       result = result.filter(item =>
         item.title.toLowerCase().includes(q) ||
         (item.summary || '').toLowerCase().includes(q) ||
-        (item.tags || []).some(t => t.toLowerCase().includes(q))
+        (item.keywords || []).some(k => k.toLowerCase().includes(q))
       );
     }
 
@@ -124,7 +161,7 @@ export default function QuickNewsPage() {
     }
 
     return result;
-  }, [items, activeCategory, searchQuery, sortMode]);
+  }, [items, activeDomain, activeSubcat, searchQuery, sortMode]);
 
   const dateGroups = useMemo(() => {
     const groupMap = new Map<string, FeedItem[]>();
@@ -164,18 +201,11 @@ export default function QuickNewsPage() {
 
       {/* Filter Bar */}
       <div className="filter-bar">
-        <button className={`filter-tab ${activeCategory === 'all' ? 'active' : ''}`} onClick={() => setActiveCategory('all')}>
-          <span className="tab-dot all" />全部
-        </button>
-        <button className={`filter-tab ${activeCategory === 'ai' ? 'active' : ''}`} onClick={() => setActiveCategory('ai')}>
-          <span className="tab-dot ai" />AI
-        </button>
-        <button className={`filter-tab ${activeCategory === 'web3' ? 'active' : ''}`} onClick={() => setActiveCategory('web3')}>
-          <span className="tab-dot web3" />Web3
-        </button>
-        <button className={`filter-tab ${activeCategory === 'finance' ? 'active' : ''}`} onClick={() => setActiveCategory('finance')}>
-          <span className="tab-dot finance" />Finance
-        </button>
+        {DOMAINS.map(d => (
+          <button key={d.key} className={`filter-tab ${activeDomain === d.key ? 'active' : ''}`} onClick={() => { setActiveDomain(d.key); setActiveSubcat(''); }}>
+            <span className={`tab-dot ${d.key === 'all' ? 'all' : d.key}`} />{d.label}
+          </button>
+        ))}
         <div className="filter-right">
           <div className={`sort-dropdown ${sortOpen ? 'open' : ''}`}>
             <button className="sort-btn" onClick={() => setSortOpen(!sortOpen)}>
@@ -200,6 +230,16 @@ export default function QuickNewsPage() {
           </div>
         </div>
       </div>
+
+      {/* Sub-category filter */}
+      {subcategories.length > 0 && (
+        <div className="filter-sub">
+          <button className={`filter-sub-btn ${activeSubcat === '' ? 'active' : ''}`} onClick={() => setActiveSubcat('')}>全部</button>
+          {subcategories.map(sub => (
+            <button key={sub} className={`filter-sub-btn ${activeSubcat === sub ? 'active' : ''}`} onClick={() => setActiveSubcat(sub)}>{sub}</button>
+          ))}
+        </div>
+      )}
 
       {/* Feed by Date */}
       {dateGroups.map(group => (
@@ -226,7 +266,7 @@ export default function QuickNewsPage() {
                   </div>
                   <div className="feed-content">
                     <div className="feed-meta-row">
-                      {item.category && <span className={`feed-cat ${item.category}`}>{item.category.toUpperCase()}</span>}
+                      <TaxonomyBadges domain={item.domain} categoryPath={item.categoryPath} keywords={item.keywords} />
                       {isNew && <span className="feed-new">NEW</span>}
                     </div>
                     <div className="feed-headline">{item.title}</div>
@@ -241,8 +281,6 @@ export default function QuickNewsPage() {
                     {isExpanded && (
                       <div className="feed-detail">
                         <div className="feed-detail-text">{item.summary}</div>
-
-                        {/* Images */}
                         {item.images && item.images.length > 0 && (
                           <div className="feed-images">
                             {item.images.map((img, i) => (
@@ -250,24 +288,14 @@ export default function QuickNewsPage() {
                             ))}
                           </div>
                         )}
-
-                        {/* AI Reasoning (评价) */}
                         {item.aiReasoning && (
                           <div className="feed-ai-reasoning">
                             <i className="bi bi-lightbulb" /> {item.aiReasoning}
                           </div>
                         )}
-
                         <div className="feed-detail-actions">
                           <span><i className="bi bi-clock" /> {time}</span>
                           <span className="feed-source-tag"><i className="bi bi-arrow-repeat" /> {item.source}</span>
-                          {item.tags && item.tags.length > 0 && (
-                            <span className="feed-tags">
-                              {item.tags.slice(0, 4).map((t, i) => (
-                                <span key={i} className="feed-tag-chip">{t}</span>
-                              ))}
-                            </span>
-                          )}
                           {item.url && (
                             <a
                               className="feed-ext-link"

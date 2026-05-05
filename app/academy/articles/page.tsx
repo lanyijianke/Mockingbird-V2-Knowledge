@@ -1,5 +1,6 @@
 'use client';
 
+import './articles.css';
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 
 interface Article {
@@ -12,6 +13,9 @@ interface Article {
   crawlTime: string;
   ingestedAt: string;
   aiReasoning: string;
+  domain: string;
+  categoryPath: string;
+  keywords: string[];
   tags: string[];
   url: string;
   images: string[];
@@ -33,13 +37,41 @@ function formatRelativeTime(dt: string): string {
   return `${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
 }
 
-const tagStyle = (tag: string): string => {
-  const t = tag.toLowerCase();
-  if (t === 'web3') return 'web3';
-  if (t === 'ai') return 'ai';
-  if (t === 'finance') return 'finance';
+const domainClass = (domain: string): string => {
+  if (domain === 'ai') return 'ai';
+  if (domain === 'finance') return 'finance';
+  if (domain === 'global') return 'global';
   return 'other';
 };
+
+function ArticleTaxonomy({ domain, categoryPath, keywords }: { domain: string; categoryPath: string; keywords: string[] }) {
+  const parts = categoryPath.split('/').filter(Boolean);
+  if (parts.length === 0) return null;
+  return (
+    <span className="article-card-tags">
+      {parts.map((part, i) => (
+        <span key={i}>
+          {i === 0 ? (
+            <span className={`article-card-tag ${domainClass(domain)}`}>{part}</span>
+          ) : (
+            <>
+              <span className="article-taxonomy-sep">/</span>
+              <span className={`article-card-tag ${domainClass(domain)}`} style={{ opacity: 0.7 - i * 0.15 }}>{part}</span>
+            </>
+          )}
+        </span>
+      ))}
+      {keywords.length > 0 && (
+        <>
+          <span className="article-taxonomy-sep" style={{ margin: '0 3px' }}>|</span>
+          {keywords.slice(0, 2).map((kw, i) => (
+            <span key={i} className="article-kw-chip">{kw}</span>
+          ))}
+        </>
+      )}
+    </span>
+  );
+}
 
 function getDateKey(dt: string): string {
   if (!dt) return 'unknown';
@@ -61,7 +93,7 @@ function getDateLabel(dateKey: string): string {
   return shortDate;
 }
 
-type CategoryTab = 'all' | 'Web3' | 'AI' | 'Finance';
+type CategoryTab = 'all' | 'AI' | 'Finance' | 'Global';
 
 export default function ArticlesPage() {
   const [articles, setArticles] = useState<Article[]>([]);
@@ -94,7 +126,7 @@ export default function ArticlesPage() {
 
   const buildUrl = useCallback((off: number) => {
     const params = new URLSearchParams({ limit: String(limit), offset: String(off) });
-    if (category !== 'all') params.set('category', category);
+    if (category !== 'all') params.set('domain', category.toLowerCase());
     if (search.trim()) params.set('search', search.trim());
     return `/api/academy/articles?${params}`;
   }, [category, search]);
@@ -184,7 +216,7 @@ export default function ArticlesPage() {
 
       {/* Filter Bar */}
       <div className="filter-bar">
-        {(['all', 'AI', 'Web3', 'Finance'] as CategoryTab[]).map(tab => (
+        {(['all', 'AI', 'Finance', 'Global'] as CategoryTab[]).map(tab => (
           <button
             key={tab}
             className={`filter-tab ${category === tab ? 'active' : ''}`}
@@ -261,11 +293,7 @@ export default function ArticlesPage() {
 
                 {/* Footer: tags, links */}
                 <div className="article-card-footer">
-                  <div className="article-card-tags">
-                    {article.tags.slice(0, 3).map((tag, i) => (
-                      <span key={i} className={`article-card-tag ${tagStyle(tag)}`}>{tag}</span>
-                    ))}
-                  </div>
+                  <ArticleTaxonomy domain={article.domain} categoryPath={article.categoryPath} keywords={article.keywords} />
                   <div className="article-card-links">
                     {article.url && (
                       <a href={article.url} target="_blank" rel="noopener noreferrer" className="article-card-ext">

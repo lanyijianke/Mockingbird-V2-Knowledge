@@ -1,0 +1,156 @@
+/* ════════════════════════════════════════════════════════════════
+   Shared UI — Page headers, pagination, buttons, breadcrumbs
+   ════════════════════════════════════════════════════════════════ */
+
+/* ═══════ Page Headers (Articles/Prompts list) ═══════ */
+.page-header {
+  margin-bottom: 2rem;
+  padding-top: 2rem;
+}
+
+.page-title {
+  font-size: 1.8rem;
+  font-weight: 900;
+  margin: 0 0 0.5rem;
+}
+
+.page-subtitle {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+}
+
+/* Filter Chips */
+.filter-bar {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 2rem;
+  align-items: center;
+}
+
+.filter-chip {
+  padding: 0.4rem 1rem;
+  border: 1px solid var(--glass-border);
+  background: transparent;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  border-radius: var(--radius-md);
+  white-space: nowrap;
+}
+
+.filter-chip:hover,
+.filter-chip.active {
+  border-color: var(--primary);
+  color: var(--primary);
+  background: rgba(16, 185, 129, 0.08);
+}
+
+.search-input {
+  padding: 0.5rem 1rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--glass-border);
+  color: var(--text-main);
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  border-radius: var(--radius-md);
+  outline: none;
+  transition: border-color 0.2s;
+  margin-left: auto;
+  min-width: 200px;
+}
+
+.search-input:focus {
+  border-color: var(--glass-border-focus);
+}
+
+.search-input::placeholder {
+  color: var(--text-muted);
+  opacity: 0.5;
+}
+
+/* ═══════ Pagination ═══════ */
+.pagination {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 3rem;
+}
+
+.pagination a,
+.pagination span {
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--glass-border);
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  transition: all 0.2s;
+}
+
+.pagination a:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.pagination .active {
+  border-color: var(--primary);
+  color: var(--primary);
+  background: rgba(16, 185, 129, 0.08);
+}
+
+/* ═══════ Button ═══════ */
+.btn-primary {
+  background: transparent;
+  color: var(--primary);
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--primary);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  letter-spacing: 0.05em;
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.1), inset 0 0 10px rgba(16, 185, 129, 0.05);
+}
+
+.btn-primary:hover {
+  background: rgba(16, 185, 129, 0.1);
+  box-shadow: 0 0 20px rgba(16, 185, 129, 0.3), inset 0 0 15px rgba(16, 185, 129, 0.2);
+  text-shadow: 0 0 8px rgba(16, 185, 129, 0.5);
+  transform: translateY(-1px);
+}
+
+/* ═══════ Breadcrumb ═══════ */
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  margin-bottom: 2rem;
+  color: var(--text-muted);
+}
+
+.crumb-link {
+  color: var(--text-muted);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.crumb-link:hover {
+  color: var(--primary);
+}
+
+.crumb-separator {
+  color: var(--glass-border-focus);
+  font-size: 0.8rem;
+}
+
+.crumb-current {
+  color: var(--primary);
+  font-weight: 600;
+}

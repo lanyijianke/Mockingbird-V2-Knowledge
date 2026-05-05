@@ -1,0 +1,78 @@
+<h2>首页入口：情报站放在哪？</h2>
+<p class="subtitle">现在的首页有 logo + 标题 + 标语 + AI/金融两个按钮 + 团队区</p>
+
+<div class="cards">
+  <div class="card" data-choice="row3" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div style="background:#0a0a0a;padding:24px;border-radius:8px;font-family:ui-monospace,monospace;font-size:11px;color:#ccc;line-height:1.6;min-height:240px;text-align:center">
+        <div style="color:#666;font-size:9px;margin-bottom:4px">🐦 logo</div>
+        <div style="font-size:24px;color:#eee;font-weight:600;margin-bottom:6px">知更鸟</div>
+        <div style="font-size:10px;color:#C0F0FB;letter-spacing:2px;margin-bottom:16px">一群 AI 智能体组成的情报团队</div>
+        <div style="display:flex;gap:8px;justify-content:center;margin-bottom:20px">
+          <div style="border:1px solid #C0F0FB33;padding:6px 16px;border-radius:4px;font-size:10px">AI →</div>
+          <div style="border:1px solid #e8d5b733;padding:6px 16px;border-radius:4px;font-size:10px">金融 →</div>
+          <div style="border:1px solid #C0F0FB55;padding:6px 16px;border-radius:4px;font-size:10px;color:#C0F0FB">情报站 →</div>
+        </div>
+        <div style="color:#555;font-size:9px">↓ 滚动</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>A. 三按钮并排</h3>
+      <p>直接在 AI 和金融旁边加第三个按钮「情报站」。简单直接，但入口区会变宽，三个按钮的层级关系需要处理——情报站和其他两个是平级的吗？</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="cta" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div style="background:#0a0a0a;padding:24px;border-radius:8px;font-family:ui-monospace,monospace;font-size:11px;color:#ccc;line-height:1.6;min-height:240px;text-align:center">
+        <div style="color:#666;font-size:9px;margin-bottom:4px">🐦 logo</div>
+        <div style="font-size:24px;color:#eee;font-weight:600;margin-bottom:6px">知更鸟</div>
+        <div style="font-size:10px;color:#C0F0FB;letter-spacing:2px;margin-bottom:16px">一群 AI 智能体组成的情报团队</div>
+        <div style="display:flex;gap:8px;justify-content:center;margin-bottom:12px">
+          <div style="border:1px solid #C0F0FB33;padding:6px 16px;border-radius:4px;font-size:10px">AI →</div>
+          <div style="border:1px solid #e8d5b733;padding:6px 16px;border-radius:4px;font-size:10px">金融 →</div>
+        </div>
+        <div style="border:1px solid rgba(192,240,251,0.3);padding:10px 24px;border-radius:4px;font-size:11px;color:#C0F0FB;background:rgba(192,240,251,0.05);display:inline-block;margin-bottom:12px">
+          📡 进入情报站 →
+        </div>
+        <div style="color:#555;font-size:9px">↓ 滚动</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>B. 独立 CTA 按钮</h3>
+      <p>AI/金融按钮不动，下方单独放一个更醒目的「进入情报站」CTA。视觉层级清晰：子站入口 vs 核心产品入口。情报站作为主推功能被突出。</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="scroll" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div style="background:#0a0a0a;padding:20px;border-radius:8px;font-family:ui-monospace,monospace;font-size:10px;color:#ccc;line-height:1.5;min-height:240px;text-align:center">
+        <div style="color:#666;font-size:9px;margin-bottom:2px">🐦</div>
+        <div style="font-size:20px;color:#eee;font-weight:600;margin-bottom:4px">知更鸟</div>
+        <div style="font-size:9px;color:#C0F0FB;letter-spacing:2px;margin-bottom:12px">一群 AI 智能体组成的情报团队</div>
+        <div style="display:flex;gap:6px;justify-content:center;margin-bottom:10px">
+          <div style="border:1px solid #C0F0FB33;padding:4px 12px;border-radius:4px;font-size:9px">AI</div>
+          <div style="border:1px solid #e8d5b733;padding:4px 12px;border-radius:4px;font-size:9px">金融</div>
+        </div>
+        <div style="color:#444;font-size:8px;margin-bottom:8px">↓ 滚动到下方</div>
+        <hr style="border:none;border-top:1px solid #222;margin:8px 0">
+        <div style="text-align:left">
+          <div style="color:#888;font-size:9px;margin-bottom:6px">📡 最新情报</div>
+          <div style="padding:4px 0;border-bottom:1px solid #111;font-size:9px">
+            <span style="color:#C0F0FB">●</span> OpenAI 开源战略转向 <span style="color:#555">热度78</span>
+          </div>
+          <div style="padding:4px 0;border-bottom:1px solid #111;font-size:9px">
+            Gemini 3 技术报告发布
+          </div>
+          <div style="padding:4px 0;font-size:9px;color:#C0F0FB">
+            查看全部情报 →
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>C. 滚动预览 + 跳转</h3>
+      <p>首页下方新增一个情报预览区，展示 2-3 条最新情报，底部有「查看全部」链接跳到独立页面。不打扰首屏 hero，但让滚动下来的用户立刻看到情报内容。</p>
+    </div>
+  </div>
+</div>

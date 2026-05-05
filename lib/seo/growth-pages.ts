@@ -62,7 +62,7 @@ const SITE_CONFIG = getSiteSeoConfig();
 const PROMPT_SCENARIO_PAGES: PromptScenarioPageDefinition[] = [
     {
         slug: 'video-generation',
-        canonicalPath: '/prompts/scenarios/video-generation',
+        canonicalPath: '/ai/prompts/scenarios/video-generation',
         title: '视频生成提示词场景库',
         description: '围绕视频生成任务整理可复用提示词、使用步骤、FAQ 与来源说明。',
         intro: '把视频生成场景拆成可理解、可引用、可继续取数的增长页定义。',
@@ -113,7 +113,7 @@ const PROMPT_SCENARIO_PAGES: PromptScenarioPageDefinition[] = [
                         label: 'Prompt Source',
                         value: `${SITE_CONFIG.alternateName} prompt library category feed`,
                         sourceName: SITE_CONFIG.alternateName,
-                        sourceUrl: '/prompts',
+                        sourceUrl: '/ai/prompts',
                     },
                 ],
             },
@@ -124,7 +124,7 @@ const PROMPT_SCENARIO_PAGES: PromptScenarioPageDefinition[] = [
 const RANKING_TOPIC_PAGES: RankingTopicPageDefinition[] = [
     {
         slug: 'ai-launches-producthunt',
-        canonicalPath: '/rankings/topics/ai-launches-producthunt',
+        canonicalPath: '/ai/rankings/topics/ai-launches-producthunt',
         title: 'AI 新品发布专题',
         description: '基于 ProductHunt 热榜整理 AI 新品发布趋势、差异和观察维度。',
         intro: '把既有 ProductHunt 榜单数据包装成更稳定的专题页定义。',
