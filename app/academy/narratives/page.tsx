@@ -24,6 +24,7 @@ interface Event {
 }
 interface NarrativeListItem {
   id: number; rank: number; title: string; category: string;
+  domain: string; categoryPath: string;
   phase: string; heatScore: number; articleCount: number;
   signalStrength: string | null; coreEntities: string[];
   summary: string; createdAt: string;
@@ -103,7 +104,7 @@ export default function NarrativesPage() {
     if (selectedId !== null) fetchDetail(selectedId);
   }, [selectedId, fetchDetail]);
 
-  const filtered = filter === 'all' ? list : list.filter(n => n.category === filter);
+  const filtered = filter === 'all' ? list : list.filter(n => n.domain === filter);
 
   // Phase stats from list
   const phaseStats = { Peak: 0, Rising: 0, Emerging: 0, Cooling: 0 };
@@ -120,9 +121,9 @@ export default function NarrativesPage() {
         <div className="narrative-list-header">
           <div className="narrative-list-title">热门叙事</div>
           <div className="narrative-filters">
-            {['all', 'ai', 'web3', 'finance'].map(cat => (
+            {['all', 'ai', 'finance', 'global'].map(cat => (
               <button key={cat} className={`narr-filter-btn ${filter === cat ? 'active' : ''}`} onClick={() => setFilter(cat)}>
-                {cat === 'all' ? '全部' : cat === 'ai' ? 'AI' : cat === 'web3' ? 'Web3' : '金融'}
+                {cat === 'all' ? '全部' : cat === 'ai' ? 'AI' : cat === 'finance' ? '金融' : 'Global'}
               </button>
             ))}
           </div>
@@ -138,7 +139,12 @@ export default function NarrativesPage() {
             <div key={n.id} className={`narr-item ${n.id === selectedId ? 'active' : ''}`} onClick={() => setSelectedId(n.id)}>
               <div className="narr-item-top">
                 <div className="narr-item-badges">
-                  <span className={`narr-cat ${n.category}`}>{n.category.toUpperCase()}</span>
+                  <span className="narr-taxonomy">
+                    <span className={`narr-cat ${n.domain}`}>{n.categoryPath.split('/')[0] || n.category.toUpperCase()}</span>
+                    {n.categoryPath.split('/').filter(Boolean).slice(1).map((part, i) => (
+                      <span key={i}><span className="narr-taxonomy-sep">/</span><span className={`narr-subcat ${n.domain}`}>{part}</span></span>
+                    ))}
+                  </span>
                   <span className={`narr-phase ${phaseClass(n.phase)}`}>{phaseLabel(n.phase)}</span>
                   {n.signalStrength && <span className={`narr-phase ${signalPhase(n.signalStrength)}`}>{signalLabel(n.signalStrength)}</span>}
                 </div>
