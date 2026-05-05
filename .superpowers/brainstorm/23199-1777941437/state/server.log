@@ -1,0 +1,8 @@
+{"type":"server-started","port":64854,"host":"127.0.0.1","url_host":"localhost","url":"http://localhost:64854","screen_dir":"/Users/grank/Mockingbird_V2_Knowledge/.superpowers/brainstorm/23199-1777941437/content","state_dir":"/Users/grank/Mockingbird_V2_Knowledge/.superpowers/brainstorm/23199-1777941437/state"}
+{"type":"screen-added","file":"/Users/grank/Mockingbird_V2_Knowledge/.superpowers/brainstorm/23199-1777941437/content/intel-layouts.html"}
+{"source":"user-event","type":"click","text":"A\n  \n    Tab 切换式\n    顶部固定 Tab 栏，点击切换内容面板。加新类型只需加一个 Tab。","choice":"a","id":null,"timestamp":1777941833164}
+{"type":"screen-added","file":"/Users/grank/Mockingbird_V2_Knowledge/.superpowers/brainstorm/23199-1777941437/content/header-styles.html"}
+{"type":"screen-added","file":"/Users/grank/Mockingbird_V2_Knowledge/.superpowers/brainstorm/23199-1777941437/content/header-agents.html"}
+{"source":"user-event","type":"click","text":"1\n  \n    卡片版（方案 1）\n    每个 Agent 一张卡片，头像 + 状态 + 进度条 + 已处理/待处理计数，下面还有汇总统计条","choice":"rich","id":null,"timestamp":1777942106111}
+{"type":"screen-added","file":"/Users/grank/Mockingbird_V2_Knowledge/.superpowers/brainstorm/23199-1777941437/content/full-design.html"}
+{"type":"server-stopped","reason":"idle timeout"}

@@ -185,9 +185,12 @@ export default function ProfilePage() {
         {/* Quick Actions */}
         <div className="profile-actions">
           {canRedeemMembership && (
-            <Link href="/membership" className="profile-action-link">
+            <button className="profile-action-link"
+              onClick={() => openAuth({ mode: 'membership' })}
+              style={{ background: 'none', border: 'none', cursor: 'pointer', font: 'inherit' }}
+            >
               <i className="bi bi-key" /> 会员兑换
-            </Link>
+            </button>
           )}
 
           <Link href="/" className="profile-action-link">

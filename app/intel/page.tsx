@@ -61,7 +61,7 @@ const NEWS_FREE_LIMIT = 20;
 const NARR_FREE_LIMIT = 5;
 
 const PHASE_LABEL: Record<string, string> = {
-  Emerging: '✨ 萌芽期', Rising: '🔥 上升期', Peak: '⚡ 高峰期', Cooling: '❄️ 冷却期',
+  Emerging: '萌芽', Rising: '升温', Peak: '高峰', Cooling: '冷却',
 };
 
 function formatTime(s: string) {
@@ -81,13 +81,6 @@ function formatDate(s: string) {
 
 function isNew(s: string) { return Date.now() - new Date(s).getTime() < 3600000; }
 
-function scoreClass(n: number | null) {
-  if (n === null) return 'low';
-  if (n >= 7) return 'high';
-  if (n >= 4) return 'mid';
-  return 'low';
-}
-
 function catClass(c: string) {
   const l = c.toLowerCase();
   if (l === 'ai') return 'ai';
@@ -102,16 +95,10 @@ function heatClass(n: number) {
   return 'low';
 }
 
-function heatNumClass(n: number) {
-  if (n >= 60) return 'intel-narr-heat-num-high';
-  if (n >= 30) return 'intel-narr-heat-num-mid';
-  return 'intel-narr-heat-num-low';
-}
-
 function signalLabel(s: string | null) {
-  if (s === 'strong') return '📡 强信号';
-  if (s === 'moderate') return '📶 中信号';
-  if (s === 'weak') return '📉 弱信号';
+  if (s === 'strong') return '强信号';
+  if (s === 'moderate') return '中信号';
+  if (s === 'weak') return '弱信号';
   return '';
 }
 
@@ -167,7 +154,7 @@ export default function IntelPage() {
   if (loading) {
     return (
       <div className="intel-main">
-        <div className="intel-loading" style={{ paddingTop: '3rem' }}>正在加载情报…</div>
+        <div className="intel-loading" style={{ paddingTop: '3rem' }}>LOADING...</div>
       </div>
     );
   }
@@ -182,8 +169,6 @@ export default function IntelPage() {
   const filteredNarr = narrFilter === 'all' ? narratives : narratives.filter(n => n.category.toLowerCase() === narrFilter);
   const visibleNarr = member ? filteredNarr : filteredNarr.slice(0, NARR_FREE_LIMIT);
   const lockedNarrItems = member ? [] : filteredNarr.slice(NARR_FREE_LIMIT);
-  const phaseStats = { Peak: 0, Rising: 0, Emerging: 0, Cooling: 0 };
-  narratives.forEach(n => { if (n.phase in phaseStats) phaseStats[n.phase as keyof typeof phaseStats]++; });
 
   return (
     <div className="intel-main">
@@ -192,7 +177,7 @@ export default function IntelPage() {
           <div className="intel-header-live-dot" />
           <span className="intel-header-live-label">LIVE · 7×24</span>
         </div>
-        <h1 className="intel-header-title">情报中心</h1>
+        <h1 className="intel-header-title">INTEL CENTER</h1>
       </div>
 
       <div className="intel-agents">
@@ -202,28 +187,20 @@ export default function IntelPage() {
           return (
             <div key={agent.id} className="intel-agent-card">
               <div className="intel-agent-top">
-                <div className="intel-agent-avatar" style={{
-                  background: `linear-gradient(135deg, ${agent.borderColor}33, ${agent.borderColor}11)`,
-                  border: `1px solid ${agent.borderColor}44`,
-                }}>
-                  {agent.icon}
-                </div>
+                <i className={`intel-agent-icon bi ${agent.icon}`} />
                 <div className="intel-agent-info">
                   <div className="intel-agent-name">{agent.name}</div>
                   <div className={`intel-agent-status ${agent.status === 'active' ? 'intel-agent-status--active' : 'intel-agent-status--idle'}`}>
-                    {agent.status === 'active' ? '●' : '○'} {agent.statusLabel}
+                    {agent.status === 'active' ? '■' : '□'} {agent.statusLabel}
                   </div>
                 </div>
               </div>
               <div className="intel-agent-counts">
                 <span>已处理 <b>{agent.processed}</b></span>
-                <span>待处理 <b className="pending">{agent.pending}</b></span>
+                <span>待处理 <b>{agent.pending}</b></span>
               </div>
               <div className="intel-agent-bar">
-                <div className="intel-agent-bar-fill" style={{
-                  width: `${pct}%`,
-                  background: agent.status === 'idle' ? '#444' : `linear-gradient(90deg, ${agent.borderColor}, #00ff88)`,
-                }} />
+                <div className="intel-agent-bar-fill" style={{ width: `${pct}%` }} />
               </div>
             </div>
           );
@@ -231,24 +208,24 @@ export default function IntelPage() {
       </div>
 
       <div className="intel-summary">
-        <span>今日情报 <b className="total">{summary.total}</b></span>
+        <span>今日情报 <b>{summary.total}</b></span>
         <div className="intel-summary-sep" />
-        <span>已处理 <b className="processed">{summary.processed}</b></span>
+        <span>已处理 <b>{summary.processed}</b></span>
         <div className="intel-summary-sep" />
-        <span>待处理 <b className="pending">{summary.pending}</b></span>
+        <span>待处理 <b>{summary.pending}</b></span>
         <div className="intel-summary-sep" />
-        <span>排队中 <b className="queued">{summary.queued}</b></span>
+        <span>排队中 <b>{summary.queued}</b></span>
       </div>
 
       <div className="intel-tabs">
         <button className={`intel-tab ${tab === 'news' ? 'active' : ''}`} onClick={() => setTab('news')}>
-          ⚡ 快讯 <span className="intel-tab-badge">{news.length}</span>
+          快讯 <span className="intel-tab-badge">{news.length}</span>
         </button>
         <button className={`intel-tab ${tab === 'narratives' ? 'active' : ''}`} onClick={() => setTab('narratives')}>
-          📊 叙事 <span className="intel-tab-badge">{narratives.length}</span>
+          叙事 <span className="intel-tab-badge">{narratives.length}</span>
         </button>
         <button className="intel-tab disabled" disabled>
-          👤 KOL追踪 <span className="intel-tab-badge">即将上线</span>
+          KOL追踪 <span className="intel-tab-badge">SOON</span>
         </button>
       </div>
 
@@ -277,7 +254,7 @@ export default function IntelPage() {
                   <span className="intel-news-card-time">{formatTime(item.crawlTime)}</span>
                   <span className="intel-news-card-source">{item.source}</span>
                   {item.qualityScore !== null && (
-                    <span className={`intel-news-card-score intel-news-card-score--${scoreClass(item.qualityScore)}`}>★ {item.qualityScore}</span>
+                    <span className="intel-news-card-score">{item.qualityScore}</span>
                   )}
                 </div>
                 <div className="intel-news-card-title">{item.title}</div>
@@ -294,7 +271,7 @@ export default function IntelPage() {
                     <p>{item.summary}</p>
                     {item.url && (
                       <a href={item.url} target="_blank" rel="noopener noreferrer" className="intel-news-card-link" onClick={e => e.stopPropagation()}>
-                        查看原文 <i className="bi bi-box-arrow-up-right" />
+                        查看原文 <i className="bi bi-arrow-up-right" />
                       </a>
                     )}
                   </div>
@@ -321,12 +298,6 @@ export default function IntelPage() {
 
       {/* Narratives Panel */}
       <div className={`intel-panel ${tab === 'narratives' ? 'active' : ''}`}>
-        <div className="intel-narr-phase-bar">
-          <span className="intel-narr-phase-stat intel-narr-phase-stat--peak">⚡ 巅峰 {phaseStats.Peak}</span>
-          <span className="intel-narr-phase-stat intel-narr-phase-stat--rising">🔥 升温 {phaseStats.Rising}</span>
-          <span className="intel-narr-phase-stat intel-narr-phase-stat--emerging">✨ 初现 {phaseStats.Emerging}</span>
-          <span className="intel-narr-phase-stat intel-narr-phase-stat--cooling">❄️ 冷却 {phaseStats.Cooling}</span>
-        </div>
         <div className="intel-narr-filters">
           {(['all', 'ai', 'web3', 'finance'] as NarrFilter[]).map(c => (
             <button key={c} className={`intel-narr-filter-btn ${narrFilter === c ? 'active' : ''}`} onClick={() => setNarrFilter(c)}>
@@ -355,7 +326,7 @@ export default function IntelPage() {
                 <div className="intel-narr-heat-bar">
                   <div className={`intel-narr-heat-fill intel-narr-heat--${heatClass(item.heatScore)}`} style={{ width: `${item.heatScore}%` }} />
                 </div>
-                <span className={`intel-narr-heat-num ${heatNumClass(item.heatScore)}`}>{item.heatScore}</span>
+                <span className="intel-narr-heat-num">{item.heatScore}</span>
               </div>
               <div className="intel-narr-card-summary">{item.summary}</div>
               <div className="intel-narr-card-footer">
@@ -403,7 +374,7 @@ export default function IntelPage() {
 
       {/* KOL Placeholder */}
       <div className={`intel-panel ${tab === 'kol' ? 'active' : ''}`}>
-        <div className="intel-placeholder">🚧 正在构建中，敬请期待</div>
+        <div className="intel-placeholder">正在构建中，敬请期待</div>
       </div>
     </div>
   );

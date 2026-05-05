@@ -25,7 +25,7 @@ function translateError(raw?: string): string {
 
 const SITE_BRAND = getSiteBrandConfig();
 
-export type AuthMode = 'login' | 'register' | 'forgot-password';
+export type AuthMode = 'login' | 'register' | 'forgot-password' | 'membership';
 
 export interface AuthModalOptions {
   mode: AuthMode;
@@ -110,9 +110,16 @@ export function AuthModalProvider({ children }: { children: ReactNode }) {
               <RegisterForm
                 onSwitchToLogin={() => switchMode('login')}
               />
-            ) : (
+            ) : options.mode === 'forgot-password' ? (
               <ForgotPasswordForm
                 onSwitchToLogin={() => switchMode('login')}
+              />
+            ) : (
+              <MembershipForm
+                onSuccess={() => {
+                  setIsOpen(false);
+                  router.refresh();
+                }}
               />
             )}
           </div>
@@ -417,6 +424,84 @@ function ForgotPasswordForm({
           返回登录
         </button>
       </div>
+    </div>
+  );
+}
+
+/* ── Membership Redeem Form ── */
+
+function MembershipForm({
+  onSuccess,
+}: {
+  onSuccess: () => void;
+}) {
+  const [code, setCode] = useState('');
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  async function handleSubmit(e: FormEvent) {
+    e.preventDefault();
+    setError('');
+    if (!code.trim()) { setError('请输入邀请码'); return; }
+    setLoading(true);
+    try {
+      const res = await fetch('/api/membership/redeem', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code: code.trim() }),
+      });
+      const data = await res.json();
+      if (!res.ok) { setError(data.error || '兑换失败，请重试'); return; }
+      setSuccess(true);
+    } catch {
+      setError('网络错误，请稍后重试');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  if (success) {
+    return (
+      <div>
+        <h1 className="auth-title">会员兑换成功</h1>
+        <div className="auth-success" style={{ marginBottom: '1.5rem' }}>
+          欢迎加入会员
+        </div>
+        <p style={{ textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.85rem', marginBottom: '1.5rem' }}>
+          你已成功成为会员，享受所有专属功能。
+        </p>
+        <button className="auth-button" style={{ display: 'block', width: '100%' }} onClick={onSuccess}>
+          完成
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      <h1 className="auth-title">会员兑换</h1>
+      <p className="auth-subtitle">输入邀请码，解锁会员专属功能</p>
+
+      <form className="auth-form" onSubmit={handleSubmit}>
+        {error && <div className="auth-error">{error}</div>}
+
+        <div>
+          <label className="auth-label" htmlFor="modal-membership-code">邀请码</label>
+          <input id="modal-membership-code" type="text" className="auth-input"
+            placeholder="输入邀请码" value={code}
+            onChange={e => setCode(e.target.value)}
+            required />
+        </div>
+
+        <button type="submit" className="auth-button" disabled={loading}>
+          {loading ? '兑换中...' : '兑换邀请码'}
+        </button>
+      </form>
+
+      <p style={{ textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.78rem', marginTop: '1rem' }}>
+        没有邀请码？暂时无法加入。
+      </p>
     </div>
   );
 }

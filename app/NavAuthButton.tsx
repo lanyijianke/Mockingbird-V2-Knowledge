@@ -131,13 +131,12 @@ export default function NavAuthButton() {
           </Link>
 
           {canRedeemMembership && (
-            <Link
-              href="/membership"
+            <button
               className="nav-auth-dropdown-item"
-              onClick={() => setOpen(false)}
+              onClick={() => { setOpen(false); openAuth({ mode: 'membership' }); }}
             >
               <i className="bi bi-key" /> 会员兑换
-            </Link>
+            </button>
           )}
 
           {user.hasPassword && (

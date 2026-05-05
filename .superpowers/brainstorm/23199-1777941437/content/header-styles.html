@@ -1,0 +1,108 @@
+<h2>Tab 上方的头部区域怎么设计？</h2>
+<p class="subtitle">这是进入情报站后、Tab 栏之上的区域，决定了第一印象</p>
+
+<div class="options">
+
+<div class="option" data-choice="compact" onclick="toggleSelect(this)">
+  <div class="letter">1</div>
+  <div class="content">
+    <h3>紧凑型</h3>
+    <p>一个小标题 + LIVE 指示器 + 一句描述，快速进入内容</p>
+  </div>
+</div>
+
+<div class="option" data-choice="rich" onclick="toggleSelect(this)">
+  <div class="letter">2</div>
+  <div class="content">
+    <h3>信息丰富型</h3>
+    <p>标题 + 描述 + 实时统计条（总快讯数、活跃叙事数等）</p>
+  </div>
+</div>
+
+<div class="option" data-choice="minimal" onclick="toggleSelect(this)">
+  <div class="letter">3</div>
+  <div class="content">
+    <h3>极简型</h3>
+    <p>没有头部，直接就是 Tab 栏，Tab 左边放"情报站"三个字</p>
+  </div>
+</div>
+
+</div>
+
+<!-- 紧凑型 -->
+<div class="mockup" style="margin-bottom: 1.5rem;">
+  <div class="mockup-header">方案 1 — 紧凑型</div>
+  <div class="mockup-body" style="background: #0a0a0a; padding: 0; font-family: -apple-system, sans-serif; color: #e0e0e0;">
+    <div style="padding: 20px 20px 0;">
+      <div style="display:flex; align-items:center; gap: 8px; margin-bottom: 4px;">
+        <div style="width: 8px; height: 8px; background: #00d4ff; border-radius: 50%; box-shadow: 0 0 8px #00d4ff;"></div>
+        <span style="font-size: 11px; color: #00d4ff; letter-spacing: 1px;">LIVE · 7×24</span>
+      </div>
+      <h1 style="font-size: 20px; font-weight: 700; color: #fff; margin: 4px 0;">情报中心</h1>
+      <p style="font-size: 12px; color: #666; margin: 0 0 12px;">AI 智能体团队为你追踪全球 AI、Web3、金融信号</p>
+    </div>
+    <div style="display: flex; border-bottom: 1px solid #222; padding: 0 20px;">
+      <div style="padding: 8px 14px; font-size: 13px; color: #00d4ff; border-bottom: 2px solid #00d4ff;">快讯</div>
+      <div style="padding: 8px 14px; font-size: 13px; color: #888;">叙事</div>
+    </div>
+  </div>
+</div>
+
+<!-- 信息丰富型 -->
+<div class="mockup" style="margin-bottom: 1.5rem;">
+  <div class="mockup-header">方案 2 — 信息丰富型</div>
+  <div class="mockup-body" style="background: #0a0a0a; padding: 0; font-family: -apple-system, sans-serif; color: #e0e0e0;">
+    <div style="padding: 20px 20px 0;">
+      <div style="display:flex; align-items:center; gap: 8px; margin-bottom: 4px;">
+        <div style="width: 8px; height: 8px; background: #00d4ff; border-radius: 50%; box-shadow: 0 0 8px #00d4ff;"></div>
+        <span style="font-size: 11px; color: #00d4ff; letter-spacing: 1px;">LIVE · 7×24</span>
+      </div>
+      <h1 style="font-size: 20px; font-weight: 700; color: #fff; margin: 4px 0;">情报中心</h1>
+      <p style="font-size: 12px; color: #666; margin: 0 0 14px;">AI 智能体团队为你追踪全球 AI、Web3、金融信号</p>
+    </div>
+    <!-- Stats bar -->
+    <div style="display: flex; gap: 12px; padding: 0 20px 12px; flex-wrap: wrap;">
+      <div style="display:flex; align-items:center; gap: 6px; padding: 6px 12px; background: #ffffff06; border-radius: 6px; border: 1px solid #ffffff0a;">
+        <span style="font-size: 14px;">⚡</span>
+        <div>
+          <div style="font-size: 14px; font-weight: 600; color: #fff;">128</div>
+          <div style="font-size: 10px; color: #666;">条快讯</div>
+        </div>
+      </div>
+      <div style="display:flex; align-items:center; gap: 6px; padding: 6px 12px; background: #ffffff06; border-radius: 6px; border: 1px solid #ffffff0a;">
+        <span style="font-size: 14px;">📊</span>
+        <div>
+          <div style="font-size: 14px; font-weight: 600; color: #fff;">24</div>
+          <div style="font-size: 10px; color: #666;">条叙事</div>
+        </div>
+      </div>
+      <div style="display:flex; align-items:center; gap: 6px; padding: 6px 12px; background: #ffffff06; border-radius: 6px; border: 1px solid #ffffff0a;">
+        <span style="font-size: 14px;">🔥</span>
+        <div>
+          <div style="font-size: 14px; font-weight: 600; color: #ff9500;">5</div>
+          <div style="font-size: 10px; color: #666;">热门叙事</div>
+        </div>
+      </div>
+    </div>
+    <div style="display: flex; border-bottom: 1px solid #222; padding: 0 20px;">
+      <div style="padding: 8px 14px; font-size: 13px; color: #00d4ff; border-bottom: 2px solid #00d4ff;">快讯</div>
+      <div style="padding: 8px 14px; font-size: 13px; color: #888;">叙事</div>
+    </div>
+  </div>
+</div>
+
+<!-- 极简型 -->
+<div class="mockup" style="margin-bottom: 1.5rem;">
+  <div class="mockup-header">方案 3 — 极简型</div>
+  <div class="mockup-body" style="background: #0a0a0a; padding: 0; font-family: -apple-system, sans-serif; color: #e0e0e0;">
+    <div style="display: flex; align-items: center; gap: 0; border-bottom: 1px solid #222; padding: 0 20px;">
+      <div style="padding: 10px 0; font-size: 15px; font-weight: 600; color: #fff; margin-right: 20px;">
+        <span style="display:inline-block; width: 8px; height: 8px; background: #00d4ff; border-radius: 50%; margin-right: 6px; box-shadow: 0 0 8px #00d4ff; vertical-align: middle;"></span>
+        情报站
+      </div>
+      <div style="padding: 10px 14px; font-size: 13px; color: #00d4ff; border-bottom: 2px solid #00d4ff;">快讯</div>
+      <div style="padding: 10px 14px; font-size: 13px; color: #888;">叙事</div>
+      <div style="padding: 10px 14px; font-size: 13px; color: #555;">KOL</div>
+    </div>
+  </div>
+</div>

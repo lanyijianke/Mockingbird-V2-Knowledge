@@ -1,0 +1,189 @@
+<h2>情报站完整设计方案</h2>
+<p class="subtitle">基于已确认的选择：Tab 切换布局 + Agent 卡片头部</p>
+
+<div class="mockup">
+  <div class="mockup-header">完整页面预览 — 快讯 Tab 激活状态</div>
+  <div class="mockup-body" style="background: #0a0a0a; padding: 0; font-family: -apple-system, sans-serif; color: #e0e0e0; font-size: 13px; line-height: 1.4;">
+
+    <!-- ═══ Nav ═══ -->
+    <div style="display:flex; align-items:center; justify-content:space-between; padding: 10px 20px; border-bottom: 1px solid #222; background: #111;">
+      <div style="font-size: 13px; color: #888;">知更鸟</div>
+      <div style="display:flex; gap: 14px; font-size: 12px; color: #666;">
+        <span>AI</span><span>金融</span><span style="color: #00d4ff;">情报站</span><span>学社</span><span style="color: #00d4ff; font-size: 11px;">登录</span>
+      </div>
+    </div>
+
+    <!-- ═══ Agent Header ═══ -->
+    <div style="padding: 16px 16px 0;">
+      <div style="display:flex; align-items:center; gap: 8px; margin-bottom: 2px;">
+        <div style="width: 8px; height: 8px; background: #00d4ff; border-radius: 50%; box-shadow: 0 0 8px #00d4ff;"></div>
+        <span style="font-size: 10px; color: #00d4ff; letter-spacing: 1px;">LIVE · 7×24</span>
+      </div>
+      <h1 style="font-size: 18px; font-weight: 700; color: #fff; margin: 4px 0 10px;">情报中心</h1>
+
+      <!-- Agent cards -->
+      <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 10px;">
+        <div style="background: #ffffff04; border: 1px solid #ffffff0a; border-radius: 8px; padding: 8px 10px;">
+          <div style="display:flex; align-items:center; gap: 6px; margin-bottom: 5px;">
+            <div style="width: 24px; height: 24px; border-radius: 50%; background: linear-gradient(135deg, #00d4ff33, #00d4ff11); display:flex; align-items:center; justify-content:center; border: 1px solid #00d4ff44;"><span style="font-size:11px;">📡</span></div>
+            <div><div style="font-size:11px; font-weight:600; color:#ddd;">哨兵</div><div style="font-size:9px; color:#00ff88;">● 爬取中</div></div>
+          </div>
+          <div style="display:flex; justify-content:space-between; font-size:9px; color:#666;"><span>已处理 <b style="color:#ccc;">47</b></span><span>待处理 <b style="color:#ff9500;">12</b></span></div>
+          <div style="height:3px; background:#ffffff0a; border-radius:2px; margin-top:3px; overflow:hidden;"><div style="width:78%; height:100%; background:linear-gradient(90deg,#00d4ff,#00ff88); border-radius:2px;"></div></div>
+        </div>
+        <div style="background: #ffffff04; border: 1px solid #ffffff0a; border-radius: 8px; padding: 8px 10px;">
+          <div style="display:flex; align-items:center; gap: 6px; margin-bottom: 5px;">
+            <div style="width: 24px; height: 24px; border-radius: 50%; background: linear-gradient(135deg, #ff950033, #ff950011); display:flex; align-items:center; justify-content:center; border: 1px solid #ff950044;"><span style="font-size:11px;">💹</span></div>
+            <div><div style="font-size:11px; font-weight:600; color:#ddd;">金脉</div><div style="font-size:9px; color:#00ff88;">● 分析中</div></div>
+          </div>
+          <div style="display:flex; justify-content:space-between; font-size:9px; color:#666;"><span>已处理 <b style="color:#ccc;">31</b></span><span>待处理 <b style="color:#ff9500;">5</b></span></div>
+          <div style="height:3px; background:#ffffff0a; border-radius:2px; margin-top:3px; overflow:hidden;"><div style="width:86%; height:100%; background:linear-gradient(90deg,#ff9500,#ffcc00); border-radius:2px;"></div></div>
+        </div>
+        <div style="background: #ffffff04; border: 1px solid #ffffff0a; border-radius: 8px; padding: 8px 10px;">
+          <div style="display:flex; align-items:center; gap: 6px; margin-bottom: 5px;">
+            <div style="width: 24px; height: 24px; border-radius: 50%; background: linear-gradient(135deg, #a855f733, #a855f711); display:flex; align-items:center; justify-content:center; border: 1px solid #a855f744;"><span style="font-size:11px;">✍️</span></div>
+            <div><div style="font-size:11px; font-weight:600; color:#ddd;">织言</div><div style="font-size:9px; color:#888;">○ 空闲</div></div>
+          </div>
+          <div style="display:flex; justify-content:space-between; font-size:9px; color:#666;"><span>已处理 <b style="color:#ccc;">18</b></span><span>待处理 <b style="color:#555;">0</b></span></div>
+          <div style="height:3px; background:#ffffff0a; border-radius:2px; margin-top:3px; overflow:hidden;"><div style="width:100%; height:100%; background:#444; border-radius:2px;"></div></div>
+        </div>
+        <div style="background: #ffffff04; border: 1px solid #ffffff0a; border-radius: 8px; padding: 8px 10px;">
+          <div style="display:flex; align-items:center; gap: 6px; margin-bottom: 5px;">
+            <div style="width: 24px; height: 24px; border-radius: 50%; background: linear-gradient(135deg, #00ff8833, #00ff8811); display:flex; align-items:center; justify-content:center; border: 1px solid #00ff8844;"><span style="font-size:11px;">🔍</span></div>
+            <div><div style="font-size:11px; font-weight:600; color:#ddd;">探针</div><div style="font-size:9px; color:#00ff88;">● 追踪中</div></div>
+          </div>
+          <div style="display:flex; justify-content:space-between; font-size:9px; color:#666;"><span>已处理 <b style="color:#ccc;">9</b></span><span>待处理 <b style="color:#ff9500;">3</b></span></div>
+          <div style="height:3px; background:#ffffff0a; border-radius:2px; margin-top:3px; overflow:hidden;"><div style="width:75%; height:100%; background:linear-gradient(90deg,#00ff88,#00d4ff); border-radius:2px;"></div></div>
+        </div>
+      </div>
+
+      <!-- Summary stats -->
+      <div style="display:flex; gap: 14px; padding: 8px 14px; background: #ffffff03; border-radius: 6px; border: 1px solid #ffffff06; margin-bottom: 12px;">
+        <span style="font-size:10px; color:#888;">今日情报 <b style="color:#fff;">128</b></span>
+        <span style="width:1px; background:#ffffff15;"></span>
+        <span style="font-size:10px; color:#888;">已处理 <b style="color:#00ff88;">105</b></span>
+        <span style="width:1px; background:#ffffff15;"></span>
+        <span style="font-size:10px; color:#888;">待处理 <b style="color:#ff9500;">20</b></span>
+        <span style="width:1px; background:#ffffff15;"></span>
+        <span style="font-size:10px; color:#888;">排队中 <b style="color:#666;">3</b></span>
+      </div>
+    </div>
+
+    <!-- ═══ Tabs ═══ -->
+    <div style="display: flex; border-bottom: 1px solid #222; padding: 0 16px;">
+      <div style="padding: 9px 14px; font-size: 12px; color: #00d4ff; border-bottom: 2px solid #00d4ff; font-weight: 600;">⚡ 快讯 <span style="background:#00d4ff22; color:#00d4ff; padding:1px 5px; border-radius:8px; font-size:10px;">128</span></div>
+      <div style="padding: 9px 14px; font-size: 12px; color: #888;">📊 叙事 <span style="background:#ffffff11; color:#888; padding:1px 5px; border-radius:8px; font-size:10px;">24</span></div>
+      <div style="padding: 9px 14px; font-size: 12px; color: #555;">👤 KOL追踪 <span style="font-size:9px; margin-left:2px;">即将上线</span></div>
+    </div>
+
+    <!-- ═══ Tab: 快讯 Content ═══ -->
+    <div style="padding: 10px 16px;">
+      <!-- Toolbar -->
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 10px;">
+        <span style="font-size:11px; color:#555;">今天 · 42 条新快讯</span>
+        <div style="display:flex; gap:4px;">
+          <span style="font-size:10px; padding:2px 7px; background:#00d4ff22; color:#00d4ff; border-radius:3px;">按时间</span>
+          <span style="font-size:10px; padding:2px 7px; background:#ffffff08; color:#888; border-radius:3px;">按质量</span>
+        </div>
+      </div>
+
+      <!-- Date separator -->
+      <div style="font-size:11px; color:#555; padding:6px 0 4px; border-bottom:1px solid #ffffff08; margin-bottom:6px;">今天</div>
+
+      <!-- News items -->
+      <div style="border-left: 2px solid #00d4ff44; padding: 7px 10px; margin-bottom: 7px; background: #ffffff04; border-radius: 0 6px 6px 0;">
+        <div style="display:flex; gap:6px; align-items:center; margin-bottom:2px;">
+          <span style="font-size:9px; background:#00ff8822; color:#00ff88; padding:1px 4px; border-radius:2px;">NEW</span>
+          <span style="font-size:10px; color:#555;">14:32</span>
+          <span style="font-size:10px; color:#888;">TechCrunch</span>
+          <span style="font-size:10px; color:#ff9500;">★ 8.5</span>
+        </div>
+        <div style="font-size:12px; color:#ccc;">OpenAI 发布 GPT-5 技术报告，多模态推理能力提升 300%</div>
+        <div style="font-size:11px; color:#666; margin-top:2px;">最新技术报告显示 GPT-5 在代码生成、数学推理方面取得重大突破…</div>
+        <div style="display:flex; gap:3px; margin-top:4px;">
+          <span style="font-size:9px; background:#00d4ff15; color:#00d4ff; padding:1px 5px; border-radius:2px;">AI</span>
+          <span style="font-size:9px; background:#a855f715; color:#a855f7; padding:1px 5px; border-radius:2px;">LLM</span>
+        </div>
+      </div>
+
+      <div style="border-left: 2px solid #ffffff11; padding: 7px 10px; margin-bottom: 7px; background: #ffffff02; border-radius: 0 6px 6px 0;">
+        <div style="display:flex; gap:6px; align-items:center; margin-bottom:2px;">
+          <span style="font-size:10px; color:#555;">13:18</span>
+          <span style="font-size:10px; color:#888;">CoinDesk</span>
+          <span style="font-size:10px; color:#00d4ff;">★ 6.2</span>
+        </div>
+        <div style="font-size:12px; color:#ccc;">以太坊 L2 赛道 TVL 突破 500 亿美元</div>
+      </div>
+
+      <div style="border-left: 2px solid #ffffff11; padding: 7px 10px; margin-bottom: 7px; background: #ffffff02; border-radius: 0 6px 6px 0;">
+        <div style="display:flex; gap:6px; align-items:center; margin-bottom:2px;">
+          <span style="font-size:10px; color:#555;">11:45</span>
+          <span style="font-size:10px; color:#888;">Bloomberg</span>
+          <span style="font-size:10px; color:#00d4ff;">★ 7.1</span>
+        </div>
+        <div style="font-size:12px; color:#ccc;">美联储会议纪要释放鸽派信号，科技股大涨</div>
+      </div>
+
+      <div style="font-size:11px; color:#555; padding:6px 0 4px; border-bottom:1px solid #ffffff08; margin-bottom:6px; margin-top: 8px;">昨天</div>
+
+      <div style="border-left: 2px solid #ffffff11; padding: 7px 10px; margin-bottom: 7px; background: #ffffff02; border-radius: 0 6px 6px 0;">
+        <div style="display:flex; gap:6px; align-items:center; margin-bottom:2px;">
+          <span style="font-size:10px; color:#555;">22:10</span>
+          <span style="font-size:10px; color:#888;">Reuters</span>
+        </div>
+        <div style="font-size:12px; color:#ccc;">英伟达宣布下一代 B300 GPU 架构</div>
+      </div>
+
+      <!-- Paywall -->
+      <div style="text-align:center; padding:14px; margin-top:8px; border:1px dashed #333; border-radius:8px;">
+        <div style="font-size:11px; color:#888;">🔒 还有 108 条快讯 · 免费浏览 20 / 128 条</div>
+        <div style="margin-top:5px; font-size:10px; color:#00d4ff; cursor:pointer;">升级会员，解锁全部 →</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div style="margin: 2rem 0;">
+  <h3>设计要点总结</h3>
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+    <div style="padding: 16px; background: #ffffff06; border-radius: 8px; border: 1px solid #ffffff0a;">
+      <h4 style="margin: 0 0 8px; color: #00d4ff;">页面结构</h4>
+      <ul style="margin: 0; padding-left: 16px; font-size: 13px; color: #aaa; line-height: 1.8;">
+        <li>顶部导航（全局复用）</li>
+        <li>Agent 卡片区（4 张卡片）</li>
+        <li>统计汇总条</li>
+        <li>Tab 栏（快讯 | 叙事 | KOL...）</li>
+        <li>Tab 内容面板</li>
+      </ul>
+    </div>
+    <div style="padding: 16px; background: #ffffff06; border-radius: 8px; border: 1px solid #ffffff0a;">
+      <h4 style="margin: 0 0 8px; color: #00d4ff;">扩展方式</h4>
+      <ul style="margin: 0; padding-left: 16px; font-size: 13px; color: #aaa; line-height: 1.8;">
+        <li>新增内容类型 → 加一个 Tab</li>
+        <li>新增 Agent → 加一张卡片</li>
+        <li>统计维度 → 改汇总条</li>
+        <li>每个 Tab 内部布局独立</li>
+        <li>移动端 Tab 横向滚动</li>
+      </ul>
+    </div>
+    <div style="padding: 16px; background: #ffffff06; border-radius: 8px; border: 1px solid #ffffff0a;">
+      <h4 style="margin: 0 0 8px; color: #ff9500;">付费墙</h4>
+      <ul style="margin: 0; padding-left: 16px; font-size: 13px; color: #aaa; line-height: 1.8;">
+        <li>快讯：免费 20 条，会员全量</li>
+        <li>叙事：免费 5 条，会员全量</li>
+        <li>未来 Tab 同理按类型设限额</li>
+        <li>Agent 头部始终可见（免费也要看到）</li>
+      </ul>
+    </div>
+    <div style="padding: 16px; background: #ffffff06; border-radius: 8px; border: 1px solid #ffffff0a;">
+      <h4 style="margin: 0 0 8px; color: #00ff88;">路由结构</h4>
+      <ul style="margin: 0; padding-left: 16px; font-size: 13px; color: #aaa; line-height: 1.8;">
+        <li><code>/intel</code> → 情报站主页（含 Tab）</li>
+        <li>Tab 切换不刷新页面（客户端状态）</li>
+        <li>导航栏只有一个"情报站"链接</li>
+        <li>Agent 状态数据来自 API</li>
+      </ul>
+    </div>
+  </div>
+</div>
