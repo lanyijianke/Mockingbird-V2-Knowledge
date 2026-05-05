@@ -175,6 +175,33 @@
 .feed-score.low { color: rgba(255,255,255,0.25); }
 @keyframes feedFadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 
+.feed-taxonomy { display: flex; gap: 4px; align-items: center; flex-wrap: wrap; }
+.feed-domain-badge {
+  font-size: 0.58rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.05em; padding: 0.1rem 0.4rem; border-radius: 3px;
+}
+.feed-domain-badge.ai { color: var(--cat-ai); background: var(--cat-ai-bg); border: 1px solid var(--cat-ai-border); }
+.feed-domain-badge.finance { color: var(--cat-finance); background: var(--cat-finance-bg); border: 1px solid var(--cat-finance-border); }
+.feed-domain-badge.global { color: var(--cat-global); background: var(--cat-global-bg); border: 1px solid var(--cat-global-border); }
+.feed-taxonomy-sep { font-size: 0.55rem; color: rgba(255,255,255,0.15); }
+.feed-subcat-badge {
+  font-size: 0.56rem; padding: 0.08rem 0.35rem; border-radius: 3px;
+}
+.feed-subcat-badge.ai { color: rgba(110,207,219,0.7); background: rgba(110,207,219,0.06); }
+.feed-subcat-badge.finance { color: rgba(212,184,122,0.7); background: rgba(212,184,122,0.06); }
+.feed-subcat-badge.global { color: rgba(251,191,36,0.7); background: rgba(251,191,36,0.06); }
+.feed-taxonomy-divider { color: rgba(255,255,255,0.08); margin: 0 2px; }
+.feed-kw-chip { font-size: 0.56rem; padding: 0.06rem 0.3rem; border-radius: 2px; background: rgba(255,255,255,0.03); color: rgba(255,255,255,0.3); }
+
+.filter-sub { display: flex; gap: 0.35rem; padding-left: 0.5rem; border-left: 2px solid rgba(232,213,183,0.1); margin-top: 0.3rem; flex-wrap: wrap; }
+.filter-sub-btn {
+  font-size: 0.68rem; padding: 0.2rem 0.6rem; border-radius: 12px;
+  background: transparent; border: 1px solid rgba(232,213,183,0.08);
+  color: rgba(232,213,183,0.4); cursor: pointer; transition: all 0.2s;
+}
+.filter-sub-btn:hover { border-color: rgba(232,213,183,0.2); color: rgba(232,213,183,0.6); }
+.filter-sub-btn.active { background: rgba(232,213,183,0.08); border-color: rgba(232,213,183,0.2); color: var(--academy-gold); }
+
 .scroll-sentinel { display: flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 2rem; font-size: 0.78rem; color: rgba(232, 213, 183, 0.3); }
 .scroll-sentinel.hidden { display: none; }
 .scroll-spinner {

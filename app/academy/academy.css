@@ -18,6 +18,9 @@
   --cat-finance: #D4B87A;
   --cat-finance-bg: rgba(212, 184, 122, 0.10);
   --cat-finance-border: rgba(212, 184, 122, 0.18);
+  --cat-global: #fbbf24;
+  --cat-global-bg: rgba(251, 191, 36, 0.10);
+  --cat-global-border: rgba(251, 191, 36, 0.18);
 }
 
 /* Break out of root .container */

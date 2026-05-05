@@ -53,10 +53,12 @@
 .article-card-footer { display: flex; justify-content: space-between; align-items: center; padding-top: 0.8rem; border-top: 1px solid rgba(232,213,183,0.04); }
 .article-card-tags { display: flex; gap: 0.35rem; flex-wrap: wrap; }
 .article-card-tag { font-size: 0.65rem; padding: 0.15rem 0.5rem; border-radius: 3px; font-weight: 600; }
-.article-card-tag.web3 { background: rgba(16,185,129,0.12); color: #10b981; }
-.article-card-tag.ai { background: rgba(244,114,182,0.12); color: #f472b6; }
-.article-card-tag.finance { background: rgba(245,158,11,0.12); color: #f59e0b; }
+.article-card-tag.ai { background: var(--cat-ai-bg); color: var(--cat-ai); border: 1px solid var(--cat-ai-border); }
+.article-card-tag.finance { background: var(--cat-finance-bg); color: var(--cat-finance); border: 1px solid var(--cat-finance-border); }
+.article-card-tag.global { background: var(--cat-global-bg); color: var(--cat-global); border: 1px solid var(--cat-global-border); }
 .article-card-tag.other { background: rgba(156,163,175,0.08); color: #9ca3af; }
 .article-card-links { display: flex; gap: 0.5rem; align-items: center; }
 .article-card-ext { font-size: 0.75rem; color: rgba(232,213,183,0.5); text-decoration: none; display: inline-flex; align-items: center; gap: 0.2rem; transition: color 0.2s; }
 .article-card-ext:hover { color: var(--academy-gold); }
+.article-taxonomy-sep { font-size: 0.55rem; color: rgba(255,255,255,0.15); }
+.article-kw-chip { font-size: 0.6rem; padding: 0.1rem 0.35rem; border-radius: 2px; background: rgba(255,255,255,0.03); color: rgba(255,255,255,0.3); }

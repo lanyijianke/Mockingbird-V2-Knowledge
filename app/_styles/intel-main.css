@@ -479,13 +479,10 @@
     border-radius: 1px;
 }
 
-.intel-cat--ai,
-.intel-cat--web3,
-.intel-cat--finance,
-.intel-cat--default {
-    color: rgba(255,255,255,0.4);
-    background: rgba(255,255,255,0.04);
-}
+.intel-cat--ai { color: #6ECFDB; background: rgba(110, 207, 219, 0.10); }
+.intel-cat--finance { color: #D4B87A; background: rgba(212, 184, 122, 0.10); }
+.intel-cat--global { color: #fbbf24; background: rgba(251, 191, 36, 0.10); }
+.intel-cat--default { color: rgba(255,255,255,0.4); background: rgba(255,255,255,0.04); }
 
 .intel-phase {
     font-family: var(--font-mono);
@@ -633,6 +630,14 @@
 .intel-narr-card-deep:hover i { transform: translateX(2px); }
 
 .intel-narr-card--blurred { filter: blur(4px); opacity: 0.35; pointer-events: none; user-select: none; }
+
+.intel-taxonomy { display: flex; gap: 3px; align-items: center; flex-wrap: wrap; }
+.intel-taxonomy-sep { font-size: 0.45rem; color: rgba(255,255,255,0.15); }
+.intel-subcat { font-family: var(--font-mono); font-size: 0.48rem; padding: 0px 3px; border-radius: 1px; }
+.intel-subcat.ai { color: rgba(110,207,219,0.6); background: rgba(110,207,219,0.05); }
+.intel-subcat.finance { color: rgba(212,184,122,0.6); background: rgba(212,184,122,0.05); }
+.intel-subcat.global { color: rgba(251,191,36,0.6); background: rgba(251,191,36,0.05); }
+.intel-kw-chip { font-family: var(--font-mono); font-size: 0.45rem; color: rgba(255,255,255,0.25); padding: 0px 3px; background: rgba(255,255,255,0.02); border-radius: 1px; }
 
 /* ═══ Paywall ═══ */
 .intel-paywall { margin-top: 1.25rem; }
