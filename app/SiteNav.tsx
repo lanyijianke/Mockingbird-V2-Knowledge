@@ -85,7 +85,7 @@ export default function SiteNav() {
         {/* ── Intel subsite navigation ── */}
         {isIntel && (
           <>
-            <Link href="/intel" className="nav-link">情报站</Link>
+            <Link href="/intel" className="nav-link" style={{ color: '#00d4ff' }}>情报站</Link>
             <Link href="/academy/narratives" className="nav-link academy-link">学社</Link>
             <NavAuthButton />
           </>

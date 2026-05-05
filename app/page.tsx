@@ -90,7 +90,7 @@ export default function BrandHomePage() {
                     </Link>
 
                     <Link href="/intel" className="brand-entry-btn brand-entry-btn--intel">
-                        <i className="bi bi-rss" />
+                        <i className="bi bi-broadcast" />
                         <span>情报站</span>
                         <i className="bi bi-arrow-right brand-entry-btn-arrow" />
                     </Link>
