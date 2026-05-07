@@ -179,7 +179,7 @@ For MVP, sub-sites should use the returned `user` to create their own session. T
 It changes:
 
 - login/register/forgot-password links redirect to Auth Service.
-- `app/AuthModalContext.tsx` login/register/forgot-password forms are removed or replaced with redirect helpers.
+- `app/AuthModalContext.tsx` keeps the modal entry experience, but login/register/forgot-password modes become redirect launchers to the Auth Service instead of embedded credential forms.
 - new `app/api/auth/callback/route.ts` handles code exchange.
 - new `lib/auth/sso-client.ts` calls the Auth Service token endpoint.
 - local user records are upserted from Auth Service user data.
@@ -277,7 +277,11 @@ AUTH_STATE_COOKIE_NAME=auth_sso_state
 
 ## UI Scope
 
-The Auth Service should reuse the existing Website auth page styles as the starting point, but it should become visually neutral enough to serve all sub-sites.
+The Website should preserve the current modal entry experience for unauthenticated users. Clicking login should still open a modal-style surface, but that surface should present unified-login actions that redirect to the Auth Service. It must not embed the Auth Service in an iframe.
+
+The Auth Service should reuse the existing Website auth modal styles as the starting point. Its login, register, forgot password, reset password, and verify email pages should render as centered card/modal-style pages so the cross-domain redirect still feels visually consistent with the current Website modal.
+
+Cross-domain iframe login is explicitly out of scope because provider OAuth, browser third-party cookie rules, frame policies, and callback handling make it unreliable.
 
 MVP does not require building a full client management admin UI. Initial SSO clients can be seeded by script or environment-driven setup.
 
@@ -312,7 +316,7 @@ Create `Mockingbird_V2_Auth` as a new Next.js project. Move identity auth pages,
 
 ### Phase 3: Convert Website To SSO Client
 
-Add Website SSO callback, SSO client helper, state cookie handling, and local user upsert. Change login/register/forgot-password entry points to redirect to Auth Service. Keep Website membership logic local.
+Add Website SSO callback, SSO client helper, state cookie handling, and local user upsert. Change login/register/forgot-password entry points to launch the Auth Service redirect while preserving the Website modal entry point. Keep Website membership logic local.
 
 ### Phase 4: Decommission Duplicate Website Auth
 
@@ -348,6 +352,7 @@ After Website login works through the Auth Service, remove or disable the old lo
 - Full OpenID Connect compliance.
 - Client self-service admin UI.
 - Shared cross-domain cookie.
+- Cross-domain iframe login.
 - Single global logout across every sub-site.
 - Centralized membership entitlement service.
 - Refresh token rotation.

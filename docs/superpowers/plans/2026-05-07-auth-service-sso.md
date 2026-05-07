@@ -16,7 +16,7 @@
 
 - Create `package.json`: scripts and dependencies for the standalone auth app.
 - Create `next.config.ts`, `tsconfig.json`, `eslint.config.mjs`, `vitest.config.ts`, `next-env.d.ts`: baseline Next/Vitest config matching Website patterns.
-- Create `app/layout.tsx`, `app/page.tsx`, `app/globals.css`: Auth Service shell and neutral auth styling.
+- Create `app/layout.tsx`, `app/page.tsx`, `app/globals.css`: Auth Service shell and centered modal/card auth styling.
 - Create `app/login/page.tsx`, `app/register/page.tsx`, `app/forgot-password/page.tsx`, `app/reset-password/page.tsx`, `app/verify-email/page.tsx`: auth UI pages.
 - Create `app/api/auth/login/route.ts`, `app/api/auth/register/route.ts`, `app/api/auth/logout/route.ts`, `app/api/auth/me/route.ts`, `app/api/auth/forgot-password/route.ts`, `app/api/auth/reset-password/route.ts`, `app/api/auth/verify-email/route.ts`: identity auth APIs.
 - Create `app/api/auth/oauth/github/route.ts`, `app/api/auth/oauth/google/route.ts`: OAuth entry/callback routes.
@@ -36,7 +36,7 @@
 - Create `app/api/auth/start/route.ts`: starts SSO redirect.
 - Create `app/api/auth/callback/route.ts`: validates state, exchanges code, upserts local user, creates Website session.
 - Modify `app/NavAuthButton.tsx`: unauthenticated login button starts SSO.
-- Modify `app/AuthModalContext.tsx`: replace login/register/forgot-password forms with redirect behavior or remove modal dependency for those modes.
+- Modify `app/AuthModalContext.tsx`: preserve the modal entry experience; replace login/register/forgot-password credential forms with unified-login redirect actions.
 - Modify `app/(auth)/login/page.tsx`, `app/(auth)/register/page.tsx`, `app/(auth)/forgot-password/page.tsx`: redirect to `/api/auth/start`.
 - Keep `app/api/auth/me/route.ts`, `app/api/auth/logout/route.ts`, `lib/auth/session.ts`, membership pages, and role helpers.
 - Add or update `tests/unit/sso-client.test.ts`, `tests/unit/sso-callback-route.test.ts`, `tests/unit/auth-start-route.test.ts`.
@@ -452,9 +452,9 @@ git commit -m "feat: add auth service database core"
 - Create identity API routes under `/Users/grank/Mockingbird_V2/Mockingbird_V2_Auth/app/api/auth/`
 - Create `/Users/grank/Mockingbird_V2/Mockingbird_V2_Auth/lib/email/send.ts`
 
-- [ ] **Step 1: Add app shell and neutral auth CSS**
+- [ ] **Step 1: Add app shell and modal-style auth CSS**
 
-Create `app/layout.tsx`, `app/page.tsx`, and `app/globals.css`. Use a simple centered auth layout and avoid Website-specific content surfaces. `app/page.tsx` should redirect to `/login`.
+Create `app/layout.tsx`, `app/page.tsx`, and `app/globals.css`. Use a centered card layout derived from the current Website auth modal visual language, with neutral Mockingbird Auth copy instead of Website-specific content surfaces. `app/page.tsx` should redirect to `/login`.
 
 - [ ] **Step 2: Port API behavior from Website**
 
@@ -766,19 +766,33 @@ git commit -m "feat: add website sso callback"
 
 - [ ] **Step 1: Replace unauthenticated nav click**
 
-Change unauthenticated `NavAuthButton` login action from opening the modal to:
+Keep unauthenticated `NavAuthButton` opening the existing auth modal:
 
 ```ts
-window.location.href = '/api/auth/start?mode=login';
+openAuth({ mode: 'login' });
 ```
 
-- [ ] **Step 2: Simplify AuthModalContext**
+- [ ] **Step 2: Convert AuthModalContext credential modes into redirect launchers**
 
-Remove embedded login/register/forgot-password form handling or make those modes redirect to `/api/auth/start`. Keep membership redemption modal behavior because membership remains Website-local.
+Remove embedded login/register/forgot-password credential submission logic, but keep the modal surface. For `login`, `register`, and `forgot-password` modes, render a compact centered panel with the current modal styling and buttons that set:
+
+```ts
+window.location.href = `/api/auth/start?mode=${mode}`;
+```
+
+Preserve `callbackUrl` when present:
+
+```ts
+const params = new URLSearchParams({ mode });
+if (callbackUrl) params.set('callbackUrl', callbackUrl);
+window.location.href = `/api/auth/start?${params.toString()}`;
+```
+
+Keep membership redemption modal behavior unchanged because membership remains Website-local.
 
 - [ ] **Step 3: Replace standalone auth pages with redirects**
 
-Each page should redirect to `/api/auth/start` with the matching mode and any `callbackUrl`.
+Each standalone page should redirect to `/api/auth/start` with the matching mode and any `callbackUrl`. These pages are fallback entry points for direct URLs; the primary Website UI remains the modal launcher.
 
 - [ ] **Step 4: Verify**
 
