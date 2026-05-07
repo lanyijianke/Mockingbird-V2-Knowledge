@@ -27,6 +27,16 @@ Create a new independent project:
 
 `Mockingbird_V2_Auth` will be a standalone Next.js Auth Service. It will own the unified identity system and expose an authorization-code based SSO flow to sub-sites.
 
+This project must also have its own GitHub repository. The current `Mockingbird_V2_Website` repository will keep only the design and integration work for the Website client. The new Auth Service code should not be committed into the Website repository.
+
+Recommended repository:
+
+```text
+https://github.com/lanyijianke/Mockingbird_V2_Auth
+```
+
+If the repository does not exist yet, the implementation should create it before the first Auth Service commit, then push the scaffolded project to `origin/main`.
+
 Sub-sites will not share the Auth Service cookie. Instead, each sub-site will redirect users to the Auth Service, receive a short-lived authorization code, exchange that code server-side for user information, and then create its own local session cookie.
 
 This keeps the design compatible with unrelated domains and avoids leaking tokens through URLs or browser history.
@@ -285,6 +295,12 @@ MVP does not require building a full client management admin UI. Initial SSO cli
 - Password reset and email verification tokens remain single-purpose and time-limited.
 
 ## Migration Plan
+
+### Phase 0: Create Independent Auth Project And Repository
+
+Create the local project directory at `/Users/grank/Mockingbird_V2/Mockingbird_V2_Auth`. Initialize it as its own git repository. Create the matching GitHub repository under the same owner as the Website repository, then connect it as `origin`.
+
+The Auth Service implementation must be committed and pushed in that new repository. The Website repository should receive only Website-side SSO client changes and documentation.
 
 ### Phase 1: Prepare Website Auth Boundaries
 
