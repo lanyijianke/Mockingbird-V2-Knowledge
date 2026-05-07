@@ -49,3 +49,4 @@ raw-incoming/prompts/
 # test artifacts
 test-results/
 .playwright-mcp/
+.superpowers/
