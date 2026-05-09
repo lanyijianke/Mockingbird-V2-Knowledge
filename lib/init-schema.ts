@@ -225,6 +225,9 @@ export async function initDatabase(conn: PoolConnection): Promise<void> {
 
     await ensureColumn(conn, 'InvitationCodes', 'TargetRole', `VARCHAR(50) NOT NULL DEFAULT 'junior_member'`);
     await ensureColumn(conn, 'InvitationCodes', 'MembershipDurationDays', 'INT NOT NULL DEFAULT 30');
+    await ensureColumn(conn, 'InvitationCodes', 'Status', `VARCHAR(20) NOT NULL DEFAULT 'active'`);
+    await ensureIndex(conn, 'idx_invite_status', `CREATE INDEX idx_invite_status ON InvitationCodes(Status)`);
+    await ensureIndex(conn, 'idx_invite_target_role', `CREATE INDEX idx_invite_target_role ON InvitationCodes(TargetRole)`);
 
     await conn.query(`
         UPDATE InvitationCodes
