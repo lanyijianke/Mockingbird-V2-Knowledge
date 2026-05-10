@@ -6,6 +6,8 @@ import NavAuthButton from '@/app/NavAuthButton';
 import { getArticleListPath } from '@/lib/articles/article-route-paths';
 import { getSiteSeoConfig } from '@/lib/seo/config';
 
+const ACADEMY_URL = process.env.NEXT_PUBLIC_ACADEMY_URL || 'http://localhost:5080';
+
 export default function SiteNav() {
   const pathname = usePathname();
   const { brandName } = getSiteSeoConfig();
@@ -13,11 +15,10 @@ export default function SiteNav() {
   const isBrandHome = pathname === '/';
   const isAi = pathname.startsWith('/ai');
   const isFinance = pathname.startsWith('/finance');
-  const isIntel = pathname.startsWith('/intel');
 
   if (isBrandHome) return null;
 
-  const brandHref = isAi ? '/ai' : isFinance ? '/finance' : isIntel ? '/intel' : '/';
+  const brandHref = isAi ? '/ai' : isFinance ? '/finance' : '/';
 
   return (
     <nav className="top-nav">
@@ -68,7 +69,7 @@ export default function SiteNav() {
               </div>
             </div>
 
-            <Link href="/academy/narratives" className="nav-link academy-link">学社</Link>
+            <a href={ACADEMY_URL} className="nav-link academy-link">学社</a>
             <NavAuthButton />
           </>
         )}
@@ -77,27 +78,17 @@ export default function SiteNav() {
         {isFinance && (
           <>
             <Link href={getArticleListPath('finance')} className="nav-link">金融文章</Link>
-            <Link href="/academy/narratives" className="nav-link academy-link">学社</Link>
-            <NavAuthButton />
-          </>
-        )}
-
-        {/* ── Intel subsite navigation ── */}
-        {isIntel && (
-          <>
-            <Link href="/intel" className="nav-link" style={{ color: '#00d4ff' }}>情报站</Link>
-            <Link href="/academy/narratives" className="nav-link academy-link">学社</Link>
+            <a href={ACADEMY_URL} className="nav-link academy-link">学社</a>
             <NavAuthButton />
           </>
         )}
 
         {/* ── Default navigation (brand home, auth pages, profile, etc.) ── */}
-        {!isAi && !isFinance && !isIntel && (
+        {!isAi && !isFinance && (
           <>
             <Link href={getArticleListPath('ai')} className="nav-link">AI</Link>
             <Link href={getArticleListPath('finance')} className="nav-link">金融</Link>
-            <Link href="/intel" className="nav-link">情报站</Link>
-            <Link href="/academy/narratives" className="nav-link academy-link">学社</Link>
+            <a href={ACADEMY_URL} className="nav-link">学社</a>
             <NavAuthButton />
           </>
         )}

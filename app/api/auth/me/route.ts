@@ -1,28 +1,31 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { query, queryOne } from '@/lib/db';
 import { GetSessionToken, ClearSessionCookie } from '@/app/api/auth/helpers';
 import { GetSession } from '@/lib/auth/session';
 import { getEffectiveRole } from '@/lib/auth/roles';
 
 export const runtime = 'nodejs';
 
-// ════════════════════════════════════════════════════════════════
-// GET /api/auth/me — 获取当前登录用户信息
-// ════════════════════════════════════════════════════════════════
+async function fetchUserFromAuth(userId: string) {
+    const authServiceUrl = process.env.AUTH_SERVICE_URL;
+    const clientId = process.env.AUTH_CLIENT_ID;
+    const clientSecret = process.env.AUTH_CLIENT_SECRET;
 
-interface UserRow {
-    Id: string;
-    Email: string;
-    Name: string;
-    Role: string;
-    MembershipExpiresAt: string | null;
-    AvatarUrl: string | null;
-    PasswordHash: string | null;
-    EmailVerifiedAt: string | null;
-}
+    if (!authServiceUrl || !clientId || !clientSecret) return null;
 
-interface OauthRow {
-    Provider: string;
+    try {
+        const res = await fetch(new URL('/api/oauth/user-info', authServiceUrl), {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ client_id: clientId, client_secret: clientSecret, user_id: userId }),
+        });
+
+        if (!res.ok) return null;
+
+        const data = await res.json();
+        return data.user ?? null;
+    } catch {
+        return null;
+    }
 }
 
 export async function GET(request: NextRequest) {
@@ -40,38 +43,25 @@ export async function GET(request: NextRequest) {
             );
         }
 
-        const user = await queryOne<UserRow>(
-            `SELECT Id, Email, Name, Role, MembershipExpiresAt, AvatarUrl, PasswordHash, EmailVerifiedAt
-             FROM Users WHERE Id = ?`,
-            [session.UserId],
-        );
-
-        if (!user) {
+        const authUser = await fetchUserFromAuth(session.UserId);
+        if (!authUser) {
             return NextResponse.json(
                 { user: null },
                 { headers: { 'Set-Cookie': ClearSessionCookie() } },
             );
         }
 
-        const effectiveRole = getEffectiveRole(user.Role, user.MembershipExpiresAt);
-
-        // 获取 OAuth 绑定列表
-        const oauthRows = await query<OauthRow>(
-            `SELECT Provider FROM OauthAccounts WHERE UserId = ?`,
-            [user.Id],
-        );
+        const effectiveRole = getEffectiveRole(authUser.role, authUser.membershipExpiresAt);
 
         return NextResponse.json({
             user: {
-                id: user.Id,
-                email: user.Email,
-                name: user.Name,
+                id: authUser.id,
+                email: authUser.email,
+                name: authUser.name,
                 role: effectiveRole,
-                avatarUrl: user.AvatarUrl,
-                emailVerified: !!user.EmailVerifiedAt,
-                hasPassword: !!user.PasswordHash,
-                membershipExpiresAt: user.MembershipExpiresAt,
-                oauthProviders: oauthRows.map((r) => r.Provider),
+                avatarUrl: authUser.avatarUrl,
+                emailVerified: !!authUser.emailVerified,
+                membershipExpiresAt: authUser.membershipExpiresAt,
             },
         });
     } catch (err) {

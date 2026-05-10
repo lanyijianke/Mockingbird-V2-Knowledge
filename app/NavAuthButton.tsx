@@ -70,10 +70,9 @@ export default function NavAuthButton() {
       await fetch('/api/auth/logout', { method: 'POST' });
       setUser(null);
       setOpen(false);
-      window.location.href = '/';
+      window.location.reload();
     } catch {
-      // Force reload on error
-      window.location.href = '/';
+      window.location.reload();
     }
   }
 
@@ -86,7 +85,7 @@ export default function NavAuthButton() {
     return (
       <button
         className="nav-auth-login"
-        onClick={() => openAuth({ mode: 'login' })}
+        onClick={() => openAuth({ mode: 'login', callbackUrl: pathname })}
       >
         登录
       </button>
@@ -122,13 +121,16 @@ export default function NavAuthButton() {
             <span className="nav-auth-dropdown-email">{user.email}</span>
           </div>
 
-          <Link
+          <a
             href="/profile"
             className="nav-auth-dropdown-item"
-            onClick={() => setOpen(false)}
+            onClick={() => {
+              sessionStorage.setItem('profile_from', window.location.href);
+              setOpen(false);
+            }}
           >
             <i className="bi bi-person" /> 个人中心
-          </Link>
+          </a>
 
           {canRedeemMembership && (
             <button

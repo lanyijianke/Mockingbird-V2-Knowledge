@@ -112,26 +112,8 @@ export async function initDatabase(conn: PoolConnection): Promise<void> {
     await ensureIndex(conn, 'idx_prompts_rawtitle', `CREATE INDEX idx_prompts_rawtitle ON Prompts(RawTitle)`);
 
     // ════════════════════════════════════════════════════════════════
-    // 用户与认证
+    // 用户会话（用户数据由 Auth 管理，本地只存 session）
     // ════════════════════════════════════════════════════════════════
-
-    await conn.query(`
-        CREATE TABLE IF NOT EXISTS Users (
-            Id              VARCHAR(36) PRIMARY KEY,
-            Name            VARCHAR(200) NOT NULL DEFAULT '',
-            Email           VARCHAR(255) NOT NULL,
-            PasswordHash    VARCHAR(255) DEFAULT NULL,
-            AvatarUrl       VARCHAR(1000) DEFAULT NULL,
-            Role            VARCHAR(50) NOT NULL DEFAULT 'user',
-            MembershipExpiresAt DATETIME DEFAULT NULL,
-            EmailVerifiedAt DATETIME DEFAULT NULL,
-            CreatedAt       DATETIME DEFAULT NOW(),
-            UpdatedAt       DATETIME DEFAULT NULL,
-            UNIQUE INDEX idx_users_email (Email)
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
-    `);
-
-    await ensureIndex(conn, 'idx_users_role', `CREATE INDEX idx_users_role ON Users(Role)`);
 
     await conn.query(`
         CREATE TABLE IF NOT EXISTS Sessions (
@@ -142,107 +124,8 @@ export async function initDatabase(conn: PoolConnection): Promise<void> {
             CreatedAt DATETIME DEFAULT NOW(),
             UNIQUE INDEX idx_sessions_token (Token),
             INDEX idx_sessions_userId (UserId),
-            INDEX idx_sessions_expires (ExpiresAt),
-            FOREIGN KEY (UserId) REFERENCES Users(Id)
+            INDEX idx_sessions_expires (ExpiresAt)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
-    `);
-
-    await conn.query(`
-        CREATE TABLE IF NOT EXISTS OauthAccounts (
-            Id                INT PRIMARY KEY AUTO_INCREMENT,
-            Provider          VARCHAR(50) NOT NULL,
-            ProviderAccountId VARCHAR(255) NOT NULL,
-            UserId            VARCHAR(36) NOT NULL,
-            CreatedAt         DATETIME DEFAULT NOW(),
-            UNIQUE INDEX idx_oauth_provider (Provider, ProviderAccountId),
-            INDEX idx_oauth_userId (UserId),
-            FOREIGN KEY (UserId) REFERENCES Users(Id)
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
-    `);
-
-    await conn.query(`
-        CREATE TABLE IF NOT EXISTS EmailVerificationTokens (
-            Id        INT PRIMARY KEY AUTO_INCREMENT,
-            Token     VARCHAR(200) NOT NULL,
-            UserId    VARCHAR(36) NOT NULL,
-            ExpiresAt DATETIME NOT NULL,
-            CreatedAt DATETIME DEFAULT NOW(),
-            UNIQUE INDEX idx_emailverify_token (Token),
-            FOREIGN KEY (UserId) REFERENCES Users(Id)
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
-    `);
-
-    await conn.query(`
-        CREATE TABLE IF NOT EXISTS PasswordResetTokens (
-            Id        INT PRIMARY KEY AUTO_INCREMENT,
-            Token     VARCHAR(200) NOT NULL,
-            UserId    VARCHAR(36) NOT NULL,
-            ExpiresAt DATETIME NOT NULL,
-            CreatedAt DATETIME DEFAULT NOW(),
-            UNIQUE INDEX idx_pwdreset_token (Token),
-            FOREIGN KEY (UserId) REFERENCES Users(Id)
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
-    `);
-
-    await ensureColumn(conn, 'Users', 'MembershipExpiresAt', 'DATETIME DEFAULT NULL');
-
-    await conn.query(`
-        UPDATE Users
-        SET Role = 'junior_member'
-        WHERE Role = 'member'
-    `);
-
-    // ════════════════════════════════════════════════════════════════
-    // 会员邀请
-    // ════════════════════════════════════════════════════════════════
-
-    await conn.query(`
-        CREATE TABLE IF NOT EXISTS InvitationCodes (
-            Id         INT PRIMARY KEY AUTO_INCREMENT,
-            Code       VARCHAR(50) NOT NULL,
-            TargetRole VARCHAR(50) NOT NULL DEFAULT 'junior_member',
-            MembershipDurationDays INT NOT NULL DEFAULT 30,
-            MaxUses    INT NOT NULL DEFAULT 1,
-            UsedCount  INT NOT NULL DEFAULT 0,
-            ExpiresAt  DATETIME NOT NULL,
-            CreatedAt  DATETIME DEFAULT NOW(),
-            UNIQUE INDEX idx_invite_code (Code)
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
-    `);
-
-    await conn.query(`
-        CREATE TABLE IF NOT EXISTS InvitationRedemptions (
-            Id                INT PRIMARY KEY AUTO_INCREMENT,
-            InvitationCodeId  INT NOT NULL,
-            UserId            VARCHAR(36) NOT NULL,
-            RedeemedAt        DATETIME DEFAULT NOW(),
-            UNIQUE INDEX idx_redemption_unique (InvitationCodeId, UserId),
-            INDEX idx_redemption_user (UserId),
-            FOREIGN KEY (InvitationCodeId) REFERENCES InvitationCodes(Id),
-            FOREIGN KEY (UserId) REFERENCES Users(Id)
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
-    `);
-
-    await ensureColumn(conn, 'InvitationCodes', 'TargetRole', `VARCHAR(50) NOT NULL DEFAULT 'junior_member'`);
-    await ensureColumn(conn, 'InvitationCodes', 'MembershipDurationDays', 'INT NOT NULL DEFAULT 30');
-    await ensureColumn(conn, 'InvitationCodes', 'Status', `VARCHAR(20) NOT NULL DEFAULT 'active'`);
-    await ensureIndex(conn, 'idx_invite_status', `CREATE INDEX idx_invite_status ON InvitationCodes(Status)`);
-    await ensureIndex(conn, 'idx_invite_target_role', `CREATE INDEX idx_invite_target_role ON InvitationCodes(TargetRole)`);
-
-    await conn.query(`
-        UPDATE InvitationCodes
-        SET TargetRole = 'junior_member'
-        WHERE TargetRole IS NULL OR TRIM(TargetRole) = '' OR TargetRole = 'member'
-    `);
-
-    await conn.query(`
-        UPDATE InvitationCodes
-        SET MembershipDurationDays = CASE
-            WHEN TargetRole = 'founder_member' THEN ${999 * 365}
-            WHEN TargetRole = 'senior_member' THEN 365
-            ELSE 30
-        END
-        WHERE MembershipDurationDays IS NULL OR MembershipDurationDays <= 0
     `);
 
 }

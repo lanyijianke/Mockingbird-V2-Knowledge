@@ -1,10 +1,7 @@
 import { NextRequest } from 'next/server';
-import crypto from 'node:crypto';
-import { execute, queryOne } from '@/lib/db';
-import { CreateSession } from '@/lib/auth/session';
 
 // ════════════════════════════════════════════════════════════════
-// Auth 辅助函数 — cookie 读写 + OAuth 登录编排
+// Auth 辅助函数 — cookie 读写
 // ════════════════════════════════════════════════════════════════
 
 const SESSION_COOKIE_NAME = 'session_token';
@@ -49,60 +46,4 @@ export function ClearSessionCookie(): string {
     ]
         .filter(Boolean)
         .join('; ');
-}
-
-/**
- * OAuth 登录编排：
- * 1. 按 provider + providerAccountId 查 oauth_accounts
- * 2. 匹配到 → 拿到 UserId；没匹配到 → 按 email 找/建 Users，再建 oauth_accounts
- * 3. 创建 session，返回 token
- */
-export async function HandleOAuthLogin(
-    provider: string,
-    providerAccountId: string,
-    email: string,
-    name: string,
-    avatarUrl?: string,
-): Promise<string> {
-    // 1) 看已有绑定
-    const existing = await queryOne<{ UserId: string }>(
-        `SELECT UserId FROM OauthAccounts WHERE Provider = ? AND ProviderAccountId = ?`,
-        [provider, providerAccountId],
-    );
-
-    let userId: string;
-
-    if (existing) {
-        // 已绑定 — 更新用户头像（如果提供了新的）
-        userId = existing.UserId;
-        if (avatarUrl) {
-            await execute(`UPDATE Users SET AvatarUrl = ? WHERE Id = ? AND (AvatarUrl IS NULL OR AvatarUrl = '')`, [
-                avatarUrl,
-                userId,
-            ]);
-        }
-    } else {
-        // 2) 未绑定 — 按 email 找或建用户
-        const user = await queryOne<{ Id: string }>(`SELECT Id FROM Users WHERE Email = ?`, [email]);
-
-        if (!user) {
-            userId = crypto.randomUUID();
-
-            await execute(
-                `INSERT INTO Users (Id, Name, Email, Role) VALUES (?, ?, ?, ?)`,
-                [userId, name, email, 'user'],
-            );
-        } else {
-            userId = user.Id;
-        }
-
-        // 建立 OAuth 绑定
-        await execute(
-            `INSERT INTO OauthAccounts (Provider, ProviderAccountId, UserId) VALUES (?, ?, ?)`,
-            [provider, providerAccountId, userId],
-        );
-    }
-
-    // 3) 创建 session
-    return CreateSession(userId);
 }

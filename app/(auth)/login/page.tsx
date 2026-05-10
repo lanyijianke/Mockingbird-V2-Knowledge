@@ -2,23 +2,21 @@
 
 import { Suspense, useEffect, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { useAuthModal } from '@/app/AuthModalContext';
 
-function LoginTrigger() {
+function LoginRedirect() {
   const searchParams = useSearchParams();
-  const { openAuth } = useAuthModal();
-  const opened = useRef(false);
+  const redirected = useRef(false);
 
   useEffect(() => {
-    if (!opened.current) {
-      opened.current = true;
-      openAuth({
-        mode: 'login',
-        callbackUrl: searchParams.get('callbackUrl') || undefined,
-        error: searchParams.get('error') || undefined,
-      });
-    }
-  }, [openAuth, searchParams]);
+    if (redirected.current) return;
+    redirected.current = true;
+
+    const params = new URLSearchParams({ mode: 'login' });
+    const callbackUrl = searchParams.get('callbackUrl');
+    if (callbackUrl) params.set('callbackUrl', callbackUrl);
+
+    window.location.href = `/api/auth/start?${params.toString()}`;
+  }, [searchParams]);
 
   return null;
 }
@@ -26,7 +24,7 @@ function LoginTrigger() {
 export default function LoginPage() {
   return (
     <Suspense>
-      <LoginTrigger />
+      <LoginRedirect />
     </Suspense>
   );
 }

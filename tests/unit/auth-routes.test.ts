@@ -1,17 +1,10 @@
 import mysql, { type RowDataPacket, type PoolConnection } from 'mysql2/promise';
-import bcrypt from 'bcryptjs';
 import crypto from 'node:crypto';
 import { NextRequest } from 'next/server';
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { initDatabase } from '@/lib/init-schema';
 
 const TEST_MYSQL_URL = process.env.MYSQL_URL;
-
-const mockSendVerificationEmail = vi.fn();
-
-vi.mock('@/lib/email/send', () => ({
-    sendVerificationEmail: mockSendVerificationEmail,
-}));
 
 describe.skipIf(!TEST_MYSQL_URL)('auth routes', () => {
     let adminConn: mysql.Connection;
@@ -53,173 +46,11 @@ describe.skipIf(!TEST_MYSQL_URL)('auth routes', () => {
     beforeEach(() => {
         vi.resetAllMocks();
         vi.resetModules();
-        mockSendVerificationEmail.mockResolvedValue({ success: true });
     });
 
     afterEach(async () => {
         await closeAppDb();
         delete process.env.MYSQL_URL;
-    });
-
-    it('POST /api/auth/register creates the user and verification token without logging the user in', async () => {
-        const dbName = await createTestDatabase();
-        const setupConn = await setupDatabase(dbName);
-        await setupConn.end();
-
-        process.env.MYSQL_URL = TEST_MYSQL_URL;
-        // Point the pool at our test database by patching the URL
-        const { default: getPool, closePool } = await import('@/lib/db');
-
-        // Re-create pool pointing at the test database
-        delete process.env.MYSQL_URL;
-        const testUrl = buildTestUrl(TEST_MYSQL_URL!, dbName);
-        process.env.MYSQL_URL = testUrl;
-
-        const { POST } = await import('@/app/api/auth/register/route');
-        const request = new Request('http://localhost:5046/api/auth/register', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                email: 'new-user@example.com',
-                password: 'correct-horse-battery',
-                name: 'New User',
-            }),
-        });
-
-        const response = await POST(request as never);
-        const body = await response.json();
-
-        // Verify via direct connection
-        const verifyConn = await mysql.createConnection({ ...parseMySqlUrl(TEST_MYSQL_URL!), database: dbName });
-        try {
-            const [userRows] = await verifyConn.query<RowDataPacket[]>(
-                `SELECT Id, Email, Name, PasswordHash FROM Users WHERE Email = 'new-user@example.com'`,
-            );
-            const [tokenRows] = await verifyConn.query<RowDataPacket[]>(
-                `SELECT Token, UserId FROM EmailVerificationTokens LIMIT 1`,
-            );
-            const [sessionCount] = await verifyConn.query<RowDataPacket[]>(
-                `SELECT COUNT(*) AS count FROM Sessions`,
-            );
-
-            expect(response.status).toBe(201);
-            expect(body).toMatchObject({
-                success: true,
-                message: '注册成功，请先验证邮箱',
-                user: {
-                    email: 'new-user@example.com',
-                    name: 'New User',
-                },
-            });
-            expect(userRows.length).toBeGreaterThan(0);
-            expect(userRows[0].Name).toBe('New User');
-            expect(userRows[0].PasswordHash).not.toBe('correct-horse-battery');
-            expect(tokenRows.length).toBeGreaterThan(0);
-            expect(tokenRows[0].UserId).toBe(userRows[0].Id);
-            expect(mockSendVerificationEmail).toHaveBeenCalledWith('new-user@example.com', tokenRows[0].Token);
-            expect(sessionCount[0].count).toBe(0);
-            expect(response.headers.get('set-cookie')).toBeNull();
-        } finally {
-            await verifyConn.end();
-        }
-    });
-
-    it('POST /api/auth/login returns 200 and writes a session cookie for an existing user with the correct password', async () => {
-        const dbName = await createTestDatabase();
-        const userId = crypto.randomUUID();
-        const setupConn = await setupDatabase(dbName);
-        const passwordHash = await bcrypt.hash('correct-horse-battery', 12);
-        await setupConn.query(
-            `INSERT INTO Users (Id, Name, Email, PasswordHash, Role, EmailVerifiedAt)
-             VALUES (?, 'Existing User', 'existing-user@example.com', ?, 'user', NOW())`,
-            [userId, passwordHash],
-        );
-        await setupConn.end();
-
-        const testUrl = buildTestUrl(TEST_MYSQL_URL!, dbName);
-        process.env.MYSQL_URL = testUrl;
-
-        const { POST } = await import('@/app/api/auth/login/route');
-        const request = new Request('http://localhost:5046/api/auth/login', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                email: 'existing-user@example.com',
-                password: 'correct-horse-battery',
-            }),
-        });
-
-        const response = await POST(request as never);
-        const body = await response.json();
-
-        // Verify session via direct connection
-        const verifyConn = await mysql.createConnection({ ...parseMySqlUrl(TEST_MYSQL_URL!), database: dbName });
-        try {
-            const [sessionRows] = await verifyConn.query<RowDataPacket[]>(
-                `SELECT Token, UserId FROM Sessions WHERE UserId = ?`,
-                [userId],
-            );
-
-            expect(response.status).toBe(200);
-            expect(body).toMatchObject({
-                success: true,
-                user: {
-                    id: userId,
-                    email: 'existing-user@example.com',
-                    name: 'Existing User',
-                    role: 'user',
-                    emailVerified: true,
-                },
-            });
-            expect(sessionRows.length).toBeGreaterThan(0);
-            expect(response.headers.get('set-cookie')).toContain(`session_token=${sessionRows[0]?.Token}`);
-        } finally {
-            await verifyConn.end();
-        }
-    });
-
-    it('POST /api/auth/login rejects password login when the email is not verified', async () => {
-        const dbName = await createTestDatabase();
-        const userId = crypto.randomUUID();
-        const setupConn = await setupDatabase(dbName);
-        const passwordHash = await bcrypt.hash('correct-horse-battery', 12);
-        await setupConn.query(
-            `INSERT INTO Users (Id, Name, Email, PasswordHash, Role, EmailVerifiedAt)
-             VALUES (?, 'Pending User', 'pending-user@example.com', ?, 'user', NULL)`,
-            [userId, passwordHash],
-        );
-        await setupConn.end();
-
-        const testUrl = buildTestUrl(TEST_MYSQL_URL!, dbName);
-        process.env.MYSQL_URL = testUrl;
-
-        const { POST } = await import('@/app/api/auth/login/route');
-        const request = new Request('http://localhost:5046/api/auth/login', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                email: 'pending-user@example.com',
-                password: 'correct-horse-battery',
-            }),
-        });
-
-        const response = await POST(request as never);
-        const body = await response.json();
-
-        // Verify no session via direct connection
-        const verifyConn = await mysql.createConnection({ ...parseMySqlUrl(TEST_MYSQL_URL!), database: dbName });
-        try {
-            const [sessionCount] = await verifyConn.query<RowDataPacket[]>(
-                `SELECT COUNT(*) AS count FROM Sessions`,
-            );
-
-            expect(response.status).toBe(403);
-            expect(body).toEqual({ error: '请先验证邮箱后再登录' });
-            expect(sessionCount[0].count).toBe(0);
-            expect(response.headers.get('set-cookie')).toBeNull();
-        } finally {
-            await verifyConn.end();
-        }
     });
 
     it('GET /api/auth/me returns a null user with 200 for anonymous requests', async () => {

@@ -1,18 +1,15 @@
 'use client';
 
 import { Suspense, useEffect, useRef } from 'react';
-import { useAuthModal } from '@/app/AuthModalContext';
 
-function ForgotPasswordTrigger() {
-  const { openAuth } = useAuthModal();
-  const opened = useRef(false);
+function ForgotPasswordRedirect() {
+  const redirected = useRef(false);
 
   useEffect(() => {
-    if (!opened.current) {
-      opened.current = true;
-      openAuth({ mode: 'forgot-password' });
-    }
-  }, [openAuth]);
+    if (redirected.current) return;
+    redirected.current = true;
+    window.location.href = '/api/auth/start?mode=forgot-password';
+  }, []);
 
   return null;
 }
@@ -20,7 +17,7 @@ function ForgotPasswordTrigger() {
 export default function ForgotPasswordPage() {
   return (
     <Suspense>
-      <ForgotPasswordTrigger />
+      <ForgotPasswordRedirect />
     </Suspense>
   );
 }
